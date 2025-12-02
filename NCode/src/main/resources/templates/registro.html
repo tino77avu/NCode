@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - NCOD3</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        #gestion-menu:hover + #gestion-dropdown,
+        #gestion-dropdown:hover {
+            display: block !important;
+        }
+        
+        .login-container {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 0 2rem 0;
+            margin-top: 80px;
+        }
+
+        .login-box {
+            background: linear-gradient(135deg, var(--bg-section) 0%, rgba(17, 17, 17, 0.95) 100%);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 136, 0.05);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-green), transparent);
+            opacity: 0.5;
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            color: var(--primary-green);
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background-color: var(--bg-dark);
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.15), 0 4px 12px rgba(0, 255, 136, 0.1);
+            background-color: rgba(10, 10, 10, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+            transition: opacity 0.3s ease;
+        }
+
+        .form-input:focus::placeholder {
+            opacity: 0.5;
+        }
+
+        .form-actions {
+            margin-top: 2rem;
+        }
+
+        .alert-message {
+            transition: opacity 0.5s ease-out;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background-color: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .alert-error {
+            background-color: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff6666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación Superior -->
+    <nav class="navbar">
+        <div class="nav-container" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%;">
+            <div class="logo-container" style="justify-self: start;">
+                <a th:href="@{/}" style="text-decoration: none;">
+                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
+                </a>
+            </div>
+            <div style="justify-self: center;">
+                <img th:src="@{/images/logo.jpg}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+            </div>
+            <div class="nav-menu" style="justify-self: end;">
+                <a th:href="@{/planes}" class="nav-link">Planes</a>
+                <a th:href="@{/contacto}" class="nav-link">Contacto</a>
+                <div style="position: relative; display: inline-block;">
+                    <a href="#" class="nav-link" id="gestion-menu">Gestión</a>
+                    <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background-color: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; margin-top: 0.5rem; min-width: 150px; z-index: 1000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+                        <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Roles</a>
+                        <a th:href="@{/gestion/empresas}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Empresas</a>
+                        <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
+                    </div>
+                </div>
+                <a th:href="@{/login}" class="nav-link nav-link-login">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor de Login -->
+    <section class="login-container">
+        <div class="container">
+            <div class="login-box">
+                <h1 class="login-title">Registrarse</h1>
+                <p class="login-subtitle">Crea tu cuenta en NCOD3</p>
+
+                <!-- Mensajes de éxito/error -->
+                <div th:if="${mensajeExito}" class="alert-message alert-success" th:text="${mensajeExito}"></div>
+                <div th:if="${mensajeError}" class="alert-message alert-error" th:text="${mensajeError}"></div>
+
+                <form th:action="@{/registro}" method="post">
+                    <div class="form-group">
+                        <label for="nombres" class="form-label">Nombres *</label>
+                        <input type="text" id="nombres" name="nombres" class="form-input" required 
+                               placeholder="Ingresa tus nombres" maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellidos" class="form-label">Apellidos *</label>
+                        <input type="text" id="apellidos" name="apellidos" class="form-input" required 
+                               placeholder="Ingresa tus apellidos" maxlength="120">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Correo electrónico *</label>
+                        <input type="email" id="email" name="email" class="form-input" required 
+                               placeholder="tu@email.com" maxlength="160">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <input type="tel" id="telefono" name="telefono" class="form-input" 
+                               placeholder="+57 300 123 4567" maxlength="30">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Contraseña *</label>
+                        <input type="password" id="password" name="password" class="form-input" required 
+                               placeholder="Ingresa tu contraseña">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirmar Contraseña *</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" required 
+                               placeholder="Confirma tu contraseña">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="cta-button" style="width: 100%;">Registrarse</button>
+                    </div>
+                    <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">¿Ya tienes una cuenta?</p>
+                        <a th:href="@{/login}" class="cta-button cta-secondary" style="display: inline-block; width: auto; padding: 0.875rem 2rem;">Iniciar Sesión</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
+                </div>
+                <p class="footer-tagline">Escribe en tu idioma, NCOD3 lo traduce a SQL</p>
+                <div class="footer-links">
+                    <a th:href="@{/planes}">Planes</a>
+                    <a th:href="@{/contacto}">Contacto</a>
+                    <a th:href="@{/login}">Login</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/1234567890" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 339.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56 81.2 56 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+        </svg>
+    </a>
+
+    <script>
+        // Validar que las contraseñas coincidan
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden');
+                return false;
+            }
+        });
+
+        // Ocultar mensajes después de 1.5 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            const mensajes = document.querySelectorAll('.alert-message');
+            mensajes.forEach(function(mensaje) {
+                setTimeout(function() {
+                    mensaje.style.transition = 'opacity 0.5s ease-out';
+                    mensaje.style.opacity = '0';
+                    setTimeout(function() {
+                        mensaje.style.display = 'none';
+                    }, 500);
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
+

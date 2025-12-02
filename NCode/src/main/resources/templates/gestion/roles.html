@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Roles - NCOD3</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        #gestion-menu:hover + #gestion-dropdown,
+        #gestion-dropdown:hover {
+            display: block !important;
+        }
+        
+        .roles-container {
+            margin-top: 100px;
+            padding: 3rem 0;
+        }
+
+        .roles-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .roles-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .roles-table-container {
+            background: linear-gradient(135deg, var(--bg-section) 0%, rgba(17, 17, 17, 0.9) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .roles-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .roles-table thead {
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .roles-table th {
+            padding: 1rem;
+            text-align: left;
+            color: var(--primary-green);
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .roles-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .roles-table tbody tr:hover {
+            background-color: rgba(0, 255, 136, 0.05);
+        }
+
+        .roles-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+        }
+
+        .btn-edit {
+            background-color: var(--primary-green);
+            color: var(--bg-dark);
+        }
+
+        .btn-edit:hover {
+            background-color: var(--primary-green-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-delete {
+            background-color: #ff4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #ff6666;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+        }
+
+        .form-container {
+            background: linear-gradient(135deg, var(--bg-section) 0%, rgba(17, 17, 17, 0.9) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background-color: var(--bg-dark);
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.15), 0 4px 12px rgba(0, 255, 136, 0.1);
+            background-color: rgba(10, 10, 10, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .alert-success {
+            background-color: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .alert-error {
+            background-color: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff6666;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .roles-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .roles-table-container {
+                overflow-x: scroll;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación Superior -->
+    <nav class="navbar">
+        <div class="nav-container" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%;">
+            <div class="logo-container" style="justify-self: start;">
+                <a th:href="@{/}" style="text-decoration: none;">
+                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
+                </a>
+            </div>
+            <div style="justify-self: center;">
+                <img th:src="@{/images/logo.jpg}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+            </div>
+            <div class="nav-menu" style="justify-self: end;">
+                <a th:href="@{/planes}" class="nav-link">Planes</a>
+                <a th:href="@{/contacto}" class="nav-link">Contacto</a>
+                <div style="position: relative; display: inline-block;" onmouseenter="document.getElementById('gestion-dropdown').style.display='block'" onmouseleave="document.getElementById('gestion-dropdown').style.display='none'">
+                    <a href="#" class="nav-link" id="gestion-menu">Gestión</a>
+                    <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background-color: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; margin-top: 0.5rem; min-width: 150px; z-index: 1000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+                        <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Roles</a>
+                        <a th:href="@{/gestion/empresas}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Empresas</a>
+                        <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
+                    </div>
+                </div>
+                <a th:href="@{/login}" class="nav-link nav-link-login">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor Principal -->
+    <section class="roles-container">
+        <div class="container">
+            <div class="roles-header">
+                <h1 class="roles-title">Gestión de Roles</h1>
+            </div>
+
+            <!-- Mensajes de éxito/error -->
+            <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+            <div th:if="${mensajeError}" class="alert alert-error" th:text="${mensajeError}"></div>
+
+            <!-- Tabla de Roles -->
+            <div class="roles-table-container">
+                <table class="roles-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Rol</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="rol : ${roles}">
+                            <td th:text="${rol.rolGlobalId}">1</td>
+                            <td th:text="${rol.nombreRol}">Nombre</td>
+                            <td th:text="${rol.descripcion}">Descripción</td>
+                            <td>
+                                <button type="button" class="btn-action btn-edit" 
+                                        th:data-id="${rol.rolGlobalId}"
+                                        th:data-nombre="${rol.nombreRol}"
+                                        th:data-descripcion="${rol.descripcion ?: ''}"
+                                        onclick="editarRolDesdeBoton(this)">
+                                    Editar
+                                </button>
+                                <form th:action="@{/gestion/roles/eliminar/{id}(id=${rol.rolGlobalId})}" method="post" style="display: inline;" 
+                                      onsubmit="return confirm('¿Estás seguro de eliminar este rol?')">
+                                    <button type="submit" class="btn-action btn-delete">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${roles == null or roles.isEmpty()}">
+                            <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                                No hay roles registrados
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Formulario de Crear/Editar -->
+            <div class="form-container">
+                <h2 style="color: var(--primary-green); margin-bottom: 1.5rem; font-size: 1.5rem;" id="form-title">Crear Nuevo Rol</h2>
+                <form th:action="@{/gestion/roles/crear}" method="post" id="rol-form">
+                    <input type="hidden" id="rol-id" name="rolGlobalId" th:value="${rol.rolGlobalId}">
+                    
+                    <div class="form-group">
+                        <label for="nombreRol" class="form-label">Nombre del Rol *</label>
+                        <input type="text" id="nombreRol" name="nombreRol" class="form-input" 
+                               th:value="${rol.nombreRol}" required 
+                               placeholder="Ej: Administrador, Usuario, etc." maxlength="50">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input type="text" id="descripcion" name="descripcion" class="form-input" 
+                               th:value="${rol.descripcion}" 
+                               placeholder="Descripción del rol" maxlength="150">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="cta-button" id="submit-btn">Crear Rol</button>
+                        <button type="button" class="cta-button cta-secondary" id="cancel-btn" style="display: none;" onclick="cancelarEdicion()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
+                </div>
+                <p class="footer-tagline">Escribe en tu idioma, NCOD3 lo traduce a SQL</p>
+                <div class="footer-links">
+                    <a th:href="@{/planes}">Planes</a>
+                    <a th:href="@{/contacto}">Contacto</a>
+                    <a th:href="@{/login}">Login</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/1234567890" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 339.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56 81.2 56 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+        </svg>
+    </a>
+
+    <script>
+        function editarRolDesdeBoton(button) {
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre');
+            const descripcion = button.getAttribute('data-descripcion') || '';
+            
+            document.getElementById('rol-id').value = id;
+            document.getElementById('nombreRol').value = nombre;
+            document.getElementById('descripcion').value = descripcion;
+            document.getElementById('form-title').textContent = 'Editar Rol';
+            document.getElementById('submit-btn').textContent = 'Actualizar Rol';
+            document.getElementById('cancel-btn').style.display = 'inline-block';
+            document.getElementById('rol-form').action = '/gestion/roles/editar/' + id;
+            
+            // Scroll al formulario
+            document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function cancelarEdicion() {
+            document.getElementById('rol-id').value = '';
+            document.getElementById('nombreRol').value = '';
+            document.getElementById('descripcion').value = '';
+            document.getElementById('form-title').textContent = 'Crear Nuevo Rol';
+            document.getElementById('submit-btn').textContent = 'Crear Rol';
+            document.getElementById('cancel-btn').style.display = 'none';
+            document.getElementById('rol-form').action = '/gestion/roles/crear';
+        }
+
+        // Ocultar mensajes después de 1.5 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            const mensajes = document.querySelectorAll('.alert');
+            mensajes.forEach(function(mensaje) {
+                setTimeout(function() {
+                    mensaje.style.transition = 'opacity 0.5s ease-out';
+                    mensaje.style.opacity = '0';
+                    setTimeout(function() {
+                        mensaje.style.display = 'none';
+                    }, 500);
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
+

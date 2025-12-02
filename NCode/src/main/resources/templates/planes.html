@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes - NCOD3</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        #gestion-menu:hover + #gestion-dropdown,
+        #gestion-dropdown:hover {
+            display: block !important;
+        }
+        
+        .planes-container {
+            margin-top: 100px;
+            padding: 4rem 0;
+        }
+
+        .planes-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .planes-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .planes-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .planes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .plan-card {
+            background: linear-gradient(135deg, var(--bg-section) 0%, rgba(17, 17, 17, 0.9) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .plan-card:hover::before {
+            left: 100%;
+        }
+
+        .plan-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.2), 0 0 0 1px rgba(0, 255, 136, 0.1);
+        }
+
+        .plan-card.featured {
+            border: 2px solid var(--primary-green);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, var(--bg-section) 100%);
+        }
+
+        .plan-card.featured::after {
+            content: 'Popular';
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: var(--primary-green);
+            color: var(--bg-dark);
+            padding: 0.5rem 2.5rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transform: rotate(45deg);
+            box-shadow: 0 4px 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .plan-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .plan-price {
+            margin-bottom: 2rem;
+        }
+
+        .plan-price-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .plan-price-period {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        #gestion-menu:hover + #gestion-dropdown,
+        #gestion-dropdown:hover {
+            display: block !important;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            color: var(--text-secondary);
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: var(--primary-green);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .plan-button {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .planes-title {
+                font-size: 2rem;
+            }
+
+            .planes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación Superior -->
+    <nav class="navbar">
+        <div class="nav-container" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%;">
+            <div class="logo-container" style="justify-self: start;">
+                <a th:href="@{/}" style="text-decoration: none;">
+                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
+                </a>
+            </div>
+            <div style="justify-self: center;">
+                <img th:src="@{/images/logo.jpg}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+            </div>
+            <div class="nav-menu" style="justify-self: end;">
+                <a th:href="@{/planes}" class="nav-link">Planes</a>
+                <a th:href="@{/contacto}" class="nav-link">Contacto</a>
+                <div style="position: relative; display: inline-block;">
+                    <a href="#" class="nav-link" id="gestion-menu">Gestión</a>
+                    <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background-color: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; margin-top: 0.5rem; min-width: 150px; z-index: 1000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+                        <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Roles</a>
+                        <a th:href="@{/gestion/empresas}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Empresas</a>
+                        <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
+                    </div>
+                </div>
+                <a th:href="@{/login}" class="nav-link nav-link-login">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sección de Planes -->
+    <section class="planes-container">
+        <div class="container">
+            <div class="planes-header">
+                <h1 class="planes-title">Elige el Plan Perfecto para Ti</h1>
+                <p class="planes-subtitle">Selecciona el modo de licenciamiento que mejor se adapte a las necesidades de tu empresa y comienza a transformar tus consultas en SQL de manera inteligente.</p>
+            </div>
+
+            <div class="planes-grid" th:if="${planes != null and !planes.isEmpty()}">
+                <!-- Planes dinámicos desde la base de datos -->
+                <div th:each="plan : ${planes}" 
+                     th:classappend="${plan.destacado == true} ? 'plan-card featured' : 'plan-card'">
+                    <h2 class="plan-name" th:text="${plan.nombre}">Plan</h2>
+                    <p class="plan-description" th:text="${plan.descripcion}">Descripción</p>
+                    <div class="plan-price">
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span th:if="${plan.precio != null}" 
+                                  class="plan-price-amount" 
+                                  th:text="${'$' + #numbers.formatDecimal(plan.precio, 0, 'COMMA', 2, 'POINT')}">$0</span>
+                            <span th:if="${plan.precio == null}" 
+                                  class="plan-price-amount" 
+                                  style="font-size: 2rem;">Personalizado</span>
+                            <span th:if="${plan.precio != null and plan.tipo != null and plan.tipo != 'personalizado'}" 
+                                  class="plan-price-period" 
+                                  th:text="'/' + ${plan.tipo}">/mes</span>
+                            <span th:if="${plan.precio == null and plan.tipo != null}" 
+                                  class="plan-price-period" 
+                                  th:text="${plan.tipo}"></span>
+                        </div>
+                    </div>
+                    <ul class="plan-features">
+                        <li th:each="detalle : ${detallesPorPlan.get(plan.planId)}" 
+                            th:text="${detalle.descripcion}">Característica</li>
+                    </ul>
+                    <a th:href="@{/contacto}" 
+                       th:text="${plan.boton != null and !plan.boton.isEmpty() ? plan.boton : 'Comenzar'}"
+                       th:classappend="${plan.destacado == true} ? 'cta-button plan-button' : 'cta-button plan-button cta-secondary'"
+                       class="cta-button plan-button">Comenzar</a>
+                    </div>
+            </div>
+            
+            <!-- Mensaje si no hay planes -->
+            <div th:if="${planes == null or planes.isEmpty()}" style="text-align: center; padding: 4rem 0;">
+                <p style="color: var(--text-secondary); font-size: 1.2rem;">No hay planes disponibles en este momento.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
+                </div>
+                <p class="footer-tagline">Escribe en tu idioma, NCOD3 lo traduce a SQL</p>
+                <div class="footer-links">
+                    <a th:href="@{/planes}">Planes</a>
+                    <a th:href="@{/contacto}">Contacto</a>
+                    <a th:href="@{/login}">Login</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/1234567890" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 339.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56 81.2 56 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+        </svg>
+    </a>
+</body>
+</html>
+
