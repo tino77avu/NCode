@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  ncode-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ncode-app
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - SERVER_CONTEXT_PATH=/NCode
+      - DATABASE_URL=jdbc:mysql://mysql:3306/ncodegestion?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - DATABASE_USERNAME=root
+      - DATABASE_PASSWORD=admin.
+    depends_on:
+      - mysql
+    networks:
+      - ncode-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: ncode-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin.
+      - MYSQL_DATABASE=ncodegestion
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - ncode-network
+
+volumes:
+  mysql-data:
+
+networks:
+  ncode-network:
+    driver: bridge
+
