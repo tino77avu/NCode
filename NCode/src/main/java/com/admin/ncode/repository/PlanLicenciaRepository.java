@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface PlanLicenciaRepository extends JpaRepository<PlanLicencia, Integer> {
-    @Query(value = "SELECT PlanID, Nombre, Descripcion, Precio, Tipo, Destacado, Boton FROM planlicencia ORDER BY PlanID ASC", nativeQuery = true)
+    @Query(value = "SELECT planid, nombre, descripcion, precio, tipo, destacado, boton FROM planlicencia ORDER BY planid ASC", nativeQuery = true)
     List<Object[]> findAllPlansNative();
 }
 

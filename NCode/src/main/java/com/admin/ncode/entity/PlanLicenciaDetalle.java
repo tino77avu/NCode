@@ -10,17 +10,17 @@ public class PlanLicenciaDetalle {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "DetalleID")
+    @Column(name = "detalleid")
     private Integer detalleId;
     
-    @Column(name = "PlanID")
+    @Column(name = "planid")
     private Integer planId;
     
-    @Column(name = "Descripcion", length = 255)
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PlanID", insertable = false, updatable = false)
+    @JoinColumn(name = "planid", insertable = false, updatable = false)
     private PlanLicencia planLicencia;
 }
 

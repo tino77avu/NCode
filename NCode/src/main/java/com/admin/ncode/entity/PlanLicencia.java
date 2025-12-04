@@ -12,25 +12,25 @@ public class PlanLicencia {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PlanID", nullable = false)
+    @Column(name = "planid", nullable = false)
     private Integer planId;
     
-    @Column(name = "Nombre", length = 50)
+    @Column(name = "nombre", length = 50)
     private String nombre;
     
-    @Column(name = "Descripcion", length = 255)
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
     
-    @Column(name = "Precio", precision = 10, scale = 2, nullable = true)
+    @Column(name = "precio", precision = 10, scale = 2, nullable = true)
     private BigDecimal precio;
     
-    @Column(name = "Tipo", length = 50)
+    @Column(name = "tipo", length = 50)
     private String tipo;
     
-    @Column(name = "Destacado")
+    @Column(name = "destacado")
     private Boolean destacado;
     
-    @Column(name = "Boton", length = 45, nullable = true)
+    @Column(name = "boton", length = 45, nullable = true)
     private String boton;
 }
 

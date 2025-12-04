@@ -10,13 +10,13 @@ public class RolGlobal {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "RolGlobalID", nullable = false)
+    @Column(name = "rolglobalid", nullable = false)
     private Integer rolGlobalId;
     
-    @Column(name = "NombreRol", length = 50, nullable = false)
+    @Column(name = "nombrerol", length = 50, nullable = false)
     private String nombreRol;
     
-    @Column(name = "Descripcion", length = 150)
+    @Column(name = "descripcion", length = 150)
     private String descripcion;
 }
 
