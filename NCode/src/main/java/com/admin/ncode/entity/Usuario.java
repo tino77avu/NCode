@@ -43,7 +43,7 @@ public class Usuario {
     private LocalDateTime fechaRegistro;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rolglobalid", nullable = false)
+    @JoinColumn(name = "rolgobalid", nullable = false)
     private RolGlobal rolGlobal;
     
     public enum EstadoUsuario {
