@@ -11,29 +11,30 @@ services:
     environment:
       - PORT=8080
       - SERVER_CONTEXT_PATH=/NCode
-      - DATABASE_URL=jdbc:mysql://mysql:3306/ncodegestion?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - DATABASE_USERNAME=root
-      - DATABASE_PASSWORD=admin.
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/ncodegestion
+      - DATABASE_USERNAME=ncode_user
+      - DATABASE_PASSWORD=N0l0s4br4s.
     depends_on:
-      - mysql
+      - postgres
     networks:
       - ncode-network
 
-  mysql:
-    image: mysql:8.0
-    container_name: ncode-mysql
+  postgres:
+    image: postgres:16-alpine
+    container_name: ncode-postgres
     environment:
-      - MYSQL_ROOT_PASSWORD=admin.
-      - MYSQL_DATABASE=ncodegestion
+      - POSTGRES_USER=ncode_user
+      - POSTGRES_PASSWORD=N0l0s4br4s.
+      - POSTGRES_DB=ncodegestion
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - ncode-network
 
 volumes:
-  mysql-data:
+  postgres-data:
 
 networks:
   ncode-network:
