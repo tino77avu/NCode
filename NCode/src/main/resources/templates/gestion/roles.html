@@ -319,7 +319,9 @@
         </svg>
     </a>
 
-    <script>
+    <script th:inline="javascript">
+        const contextPath = /*[[@{/}]]*/ '/NCode/';
+        
         function editarRolDesdeBoton(button) {
             const id = button.getAttribute('data-id');
             const nombre = button.getAttribute('data-nombre');
@@ -331,7 +333,7 @@
             document.getElementById('form-title').textContent = 'Editar Rol';
             document.getElementById('submit-btn').textContent = 'Actualizar Rol';
             document.getElementById('cancel-btn').style.display = 'inline-block';
-            document.getElementById('rol-form').action = '/gestion/roles/editar/' + id;
+            document.getElementById('rol-form').action = contextPath + 'gestion/roles/editar/' + id;
             
             // Scroll al formulario
             document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -344,7 +346,7 @@
             document.getElementById('form-title').textContent = 'Crear Nuevo Rol';
             document.getElementById('submit-btn').textContent = 'Crear Rol';
             document.getElementById('cancel-btn').style.display = 'none';
-            document.getElementById('rol-form').action = '/gestion/roles/crear';
+            document.getElementById('rol-form').action = contextPath + 'gestion/roles/crear';
         }
 
         // Ocultar mensajes después de 1.5 segundos
