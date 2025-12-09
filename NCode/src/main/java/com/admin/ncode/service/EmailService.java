@@ -31,7 +31,14 @@ public class EmailService {
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
+            System.out.println("Correo enviado exitosamente a: " + toEmail);
         } catch (MessagingException | UnsupportedEncodingException e) {
+            System.err.println("Error al enviar el correo electrónico a " + toEmail + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+        } catch (Exception e) {
+            System.err.println("Error inesperado al enviar el correo electrónico a " + toEmail + ": " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
         }
     }

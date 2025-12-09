@@ -86,42 +86,47 @@ public class PasswordResetController {
             session.setAttribute(EMAIL_SESION_KEY, email);
             session.setAttribute(TIMESTAMP_SESION_KEY, System.currentTimeMillis());
             
-            // Enviar email con el código
+            // Obtener IP del cliente
+            String ipCliente = obtenerIpCliente(request);
+            
+            // Obtener empresaId (usar la primera empresa activa o un valor por defecto)
+            Long empresaId = obtenerEmpresaId();
+            
+            // Guardar registro en la tabla codigoverificacion ANTES de enviar el email
+            // para asegurar que el registro se guarde incluso si falla el envío
+            try {
+                LocalDateTime fechaExpiracion = LocalDateTime.now().plusMinutes(15);
+                codigoVerificacionRepository.insertCodigoVerificacion(
+                    usuario.getUsuarioId(),
+                    empresaId,
+                    codigo,
+                    "RESET_CLAVE",
+                    "GENERADO",
+                    0,
+                    3, // Máximo 3 intentos
+                    fechaExpiracion,
+                    ipCliente
+                );
+            } catch (Exception dbException) {
+                // Si falla el insert, loguear y mostrar error
+                System.err.println("Error al guardar código de verificación en BD: " + dbException.getMessage());
+                dbException.printStackTrace();
+                model.addAttribute("mensajeError", 
+                    "Error al procesar la solicitud. Por favor, intenta nuevamente.");
+                return "olvidar-contrasena";
+            }
+            
+            // Enviar email con el código DESPUÉS de guardar en BD
             try {
                 emailService.enviarCodigoVerificacion(email, codigo);
-                
-                // Obtener IP del cliente
-                String ipCliente = obtenerIpCliente(request);
-                
-                // Obtener empresaId (usar la primera empresa activa o un valor por defecto)
-                Long empresaId = obtenerEmpresaId();
-                
-                // Guardar registro en la tabla codigoverificacion usando consulta nativa
-                // para manejar correctamente los tipos enum de PostgreSQL
-                try {
-                    LocalDateTime fechaExpiracion = LocalDateTime.now().plusMinutes(15);
-                    codigoVerificacionRepository.insertCodigoVerificacion(
-                        usuario.getUsuarioId(),
-                        empresaId,
-                        codigo,
-                        "RESET_CLAVE",
-                        "GENERADO",
-                        0,
-                        3, // Máximo 3 intentos
-                        fechaExpiracion,
-                        ipCliente
-                    );
-                } catch (Exception dbException) {
-                    // Si falla el insert, loguear pero no fallar el flujo completo
-                    // El correo ya se envió, así que el usuario puede continuar
-                    System.err.println("Error al guardar código de verificación en BD: " + dbException.getMessage());
-                    dbException.printStackTrace();
-                }
                 
                 redirectAttributes.addFlashAttribute("email", email);
                 redirectAttributes.addFlashAttribute("mensajeExito", "✓ Correo enviado satisfactoriamente");
                 return "redirect:/cambiar-contrasena";
             } catch (Exception e) {
+                // Si falla el envío, loguear el error pero el código ya está guardado
+                System.err.println("Error al enviar el correo electrónico: " + e.getMessage());
+                e.printStackTrace();
                 model.addAttribute("mensajeError", 
                     "Error al enviar el correo electrónico. Por favor, intenta nuevamente.");
                 return "olvidar-contrasena";
