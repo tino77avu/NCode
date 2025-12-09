@@ -19,6 +19,7 @@ public class EmpresaController {
 
     @GetMapping
     public String listarEmpresas(Model model) {
+        model.addAttribute("isAuthenticated", true);
         List<Empresa> empresas = empresaRepository.findAllByOrderByEmpresaIdAsc();
         model.addAttribute("empresas", empresas);
         model.addAttribute("empresa", new Empresa());
@@ -71,13 +72,25 @@ public class EmpresaController {
         return "redirect:/gestion/empresas";
     }
 
-    @PostMapping("/eliminar/{id}")
-    public String eliminarEmpresa(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    @PostMapping("/bloquear/{id}")
+    public String bloquearEmpresa(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            empresaRepository.deleteById(id);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Empresa eliminada exitosamente");
+            // Usar SUSPENDIDA ya que BLOQUEADA no existe en el enum de PostgreSQL
+            empresaRepository.updateEstado(id, "SUSPENDIDA");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Bloqueo Satisfactorio");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "Error al eliminar la empresa: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al bloquear la empresa: " + e.getMessage());
+        }
+        return "redirect:/gestion/empresas";
+    }
+
+    @PostMapping("/activar/{id}")
+    public String activarEmpresa(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            empresaRepository.updateEstado(id, "ACTIVA");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Activación Satisfactoria");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al activar la empresa: " + e.getMessage());
         }
         return "redirect:/gestion/empresas";
     }

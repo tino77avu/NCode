@@ -67,7 +67,7 @@
         }
 
         .empresas-table tbody tr:hover {
-            background-color: rgba(0, 255, 136, 0.05);
+            background-color: rgba(0, 191, 255, 0.05);
         }
 
         .empresas-table tbody tr:last-child td {
@@ -75,36 +75,60 @@
         }
 
         .btn-action {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
             transition: all 0.3s ease;
             margin-right: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background-color: transparent;
+        }
+
+        .btn-action svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
         }
 
         .btn-edit {
-            background-color: var(--primary-green);
-            color: var(--bg-dark);
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
         }
 
         .btn-edit:hover {
-            background-color: var(--primary-green-light);
+            background-color: var(--primary-green);
+            color: var(--bg-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
         }
 
-        .btn-delete {
-            background-color: #ff4444;
+        .btn-suspend {
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        .btn-suspend:hover {
+            background-color: #ff9800;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
         }
 
-        .btn-delete:hover {
-            background-color: #ff6666;
+        .btn-activate {
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+
+        .btn-activate:hover {
+            background-color: #4caf50;
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
         .form-container {
@@ -142,7 +166,7 @@
         .form-input:focus, .form-select:focus {
             outline: none;
             border-color: var(--primary-green);
-            box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.15), 0 4px 12px rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.15), 0 4px 12px rgba(0, 191, 255, 0.1);
             background-color: rgba(10, 10, 10, 0.8);
             transform: translateY(-1px);
         }
@@ -159,7 +183,7 @@
         }
 
         .alert-success {
-            background-color: rgba(0, 255, 136, 0.1);
+            background-color: rgba(0, 191, 255, 0.1);
             border: 1px solid var(--primary-green);
             color: var(--primary-green);
         }
@@ -184,7 +208,7 @@
         }
 
         .estado-activa {
-            background-color: rgba(0, 255, 136, 0.2);
+            background-color: rgba(0, 191, 255, 0.2);
             color: var(--primary-green);
         }
 
@@ -196,6 +220,11 @@
         .estado-baja {
             background-color: rgba(255, 68, 68, 0.2);
             color: #ff4444;
+        }
+
+        .estado-bloqueada {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
         }
 
         @media (max-width: 768px) {
@@ -224,8 +253,6 @@
                 <img th:src="@{/images/Logo.JPG}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
             </div>
             <div class="nav-menu" style="justify-self: end;">
-                <a th:href="@{/planes}" class="nav-link">Planes</a>
-                <a th:href="@{/contacto}" class="nav-link">Contacto</a>
                 <div style="position: relative; display: inline-block;" onmouseenter="document.getElementById('gestion-dropdown').style.display='block'" onmouseleave="document.getElementById('gestion-dropdown').style.display='none'">
                     <a href="#" class="nav-link" id="gestion-menu">Gestión</a>
                     <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background-color: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; margin-top: 0.5rem; min-width: 150px; z-index: 1000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
@@ -234,7 +261,7 @@
                         <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
                     </div>
                 </div>
-                <a th:href="@{/login}" class="nav-link nav-link-login">Login</a>
+                <a th:href="@{/logout}" class="nav-link nav-link-login">Cerrar Sesión</a>
             </div>
         </div>
     </nav>
@@ -287,13 +314,28 @@
                                         th:data-nombre="${empresa.nombreComercial ?: ''}"
                                         th:data-pais="${empresa.pais ?: ''}"
                                         th:data-estado="${empresa.estado}"
-                                        onclick="editarEmpresaDesdeBoton(this)">
-                                    Editar
+                                        onclick="editarEmpresaDesdeBoton(this)"
+                                        title="Editar empresa">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/>
+                                    </svg>
                                 </button>
-                                <form th:action="@{/gestion/empresas/eliminar/{id}(id=${empresa.empresaId})}" method="post" style="display: inline;" 
-                                      onsubmit="return confirm('¿Estás seguro de eliminar esta empresa?')">
-                                    <button type="submit" class="btn-action btn-delete">Eliminar</button>
-                                </form>
+                                <button type="button" class="btn-action btn-suspend" 
+                                        th:if="${empresa.estado == T(com.admin.ncode.entity.Empresa.EstadoEmpresa).ACTIVA}"
+                                        th:onclick="'bloquearEmpresa(' + ${empresa.empresaId} + ')'"
+                                        title="Bloquear empresa">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                        <path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="btn-action btn-activate" 
+                                        th:if="${empresa.estado == T(com.admin.ncode.entity.Empresa.EstadoEmpresa).SUSPENDIDA || empresa.estado == T(com.admin.ncode.entity.Empresa.EstadoEmpresa).BAJA}"
+                                        th:onclick="'activarEmpresa(' + ${empresa.empresaId} + ')'"
+                                        title="Activar empresa">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                        <path d="M352 144c0-44.2 35.8-80 80-80s80 35.8 80 80v48c0 17.7 14.3 32 32 32s32-14.3 32-32V144C576 64.5 511.5 0 432 0S288 64.5 288 144v48H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H352V144z"/>
+                                    </svg>
+                                </button>
                             </td>
                         </tr>
                         <tr th:if="${empresas == null or empresas.isEmpty()}">
@@ -384,15 +426,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">
-                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
-                </div>
                 <p class="footer-tagline">Escribe en tu idioma, NCOD3 lo traduce a SQL</p>
-                <div class="footer-links">
-                    <a th:href="@{/planes}">Planes</a>
-                    <a th:href="@{/contacto}">Contacto</a>
-                    <a th:href="@{/login}">Login</a>
-                </div>
             </div>
         </div>
     </footer>
@@ -404,7 +438,9 @@
         </svg>
     </a>
 
-    <script>
+    <script th:inline="javascript">
+        const contextPath = /*[[@{/}]]*/ '/NCode/';
+        
         function editarEmpresaDesdeBoton(button) {
             const id = button.getAttribute('data-id');
             const ruc = button.getAttribute('data-ruc');
@@ -422,7 +458,7 @@
             document.getElementById('form-title').textContent = 'Editar Empresa';
             document.getElementById('submit-btn').textContent = 'Actualizar Empresa';
             document.getElementById('cancel-btn').style.display = 'inline-block';
-            document.getElementById('empresa-form').action = '/gestion/empresas/editar/' + id;
+            document.getElementById('empresa-form').action = contextPath + 'gestion/empresas/editar/' + id;
             
             // Scroll al formulario
             document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -438,7 +474,23 @@
             document.getElementById('form-title').textContent = 'Crear Nueva Empresa';
             document.getElementById('submit-btn').textContent = 'Crear Empresa';
             document.getElementById('cancel-btn').style.display = 'none';
-            document.getElementById('empresa-form').action = '/gestion/empresas/crear';
+            document.getElementById('empresa-form').action = contextPath + 'gestion/empresas/crear';
+        }
+
+        function bloquearEmpresa(id) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = contextPath + 'gestion/empresas/bloquear/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function activarEmpresa(id) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = contextPath + 'gestion/empresas/activar/' + id;
+            document.body.appendChild(form);
+            form.submit();
         }
 
         // Ocultar mensajes después de 1.5 segundos

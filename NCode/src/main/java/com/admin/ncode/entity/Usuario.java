@@ -33,7 +33,7 @@ public class Usuario {
     private Boolean esAdminGlobal = false;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado")
+    @Column(name = "estado", columnDefinition = "usuario_estado")
     private EstadoUsuario estado = EstadoUsuario.ACTIVO;
     
     @Column(name = "ultimologin")

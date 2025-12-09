@@ -24,6 +24,7 @@ public class UsuarioController {
 
     @GetMapping
     public String listarUsuarios(Model model) {
+        model.addAttribute("isAuthenticated", true);
         List<Usuario> usuarios = usuarioRepository.findAllByOrderByUsuarioIdAsc();
         List<RolGlobal> roles = rolGlobalRepository.findAllByOrderByRolGlobalIdAsc();
         model.addAttribute("usuarios", usuarios);
@@ -99,13 +100,24 @@ public class UsuarioController {
         return "redirect:/gestion/usuarios";
     }
 
-    @PostMapping("/eliminar/{id}")
-    public String eliminarUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    @PostMapping("/bloquear/{id}")
+    public String bloquearUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            usuarioRepository.deleteById(id);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Usuario eliminado exitosamente");
+            usuarioRepository.updateEstado(id, "BLOQUEADO");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Bloqueo Satisfactorio");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "Error al eliminar el usuario: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al bloquear el usuario: " + e.getMessage());
+        }
+        return "redirect:/gestion/usuarios";
+    }
+
+    @PostMapping("/activar/{id}")
+    public String activarUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            usuarioRepository.updateEstado(id, "ACTIVO");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Activación Satisfactoria");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al activar el usuario: " + e.getMessage());
         }
         return "redirect:/gestion/usuarios";
     }

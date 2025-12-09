@@ -27,7 +27,7 @@ public class Empresa {
     private String pais;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado")
+    @Column(name = "estado", columnDefinition = "empresa_estado")
     private EstadoEmpresa estado;
     
     @Column(name = "fechacreacion", insertable = false, updatable = false)

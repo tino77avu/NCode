@@ -1,0 +1,19 @@
+ncodegestion
+N0l0s4br4s.
+
+Conexión Render
+
+hostname: dpg-d4oghla4d50c738sacn0-a
+port: 5432
+database: ncodegestion_2bca
+username: ncode_user
+password: HofIh7S1SserqJ4pJE4v8CTs0MY0APcR
+internal database: postgresql://ncode_user:HofIh7S1SserqJ4pJE4v8CTs0MY0APcR@dpg-d4oghla4d50c738sacn0-a/ncodegestion_2bca
+external database: postgresql://ncode_user:HofIh7S1SserqJ4pJE4v8CTs0MY0APcR@dpg-d4oghla4d50c738sacn0-a.oregon-postgres.render.com/ncodegestion_2bca
+	           postgres://user:password@dpg-xxxx.oregon-postgres.render.com:5432/ncodegestion_2bca
+
+psql command: PGPASSWORD=HofIh7S1SserqJ4pJE4v8CTs0MY0APcR psql -h dpg-d4oghla4d50c738sacn0-a.oregon-postgres.render.com -U ncode_user ncodegestion_2bca
+
+postgresql://ncode_user:HofIh7S1SserqJ4pJE4v8CTs0MY0APcR@dpg-d4oghla4d50c738sacn0-a.oregon-postgres.render.com/ncodegestion_2bca
+
+.\psql.exe "host=dpg-d4oghla4d50c738sacn0-a.oregon-postgres.render.com port=5432 dbname=ncodegestion_2bca user=ncode_user sslmode=require"

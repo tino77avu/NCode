@@ -30,7 +30,7 @@
             border: 1px solid var(--border-color);
             max-width: 420px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 136, 0.05);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 191, 255, 0.05);
             backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
@@ -54,7 +54,7 @@
             text-align: center;
             color: var(--primary-green);
             letter-spacing: -0.02em;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
         }
 
         .login-subtitle {
@@ -92,7 +92,7 @@
         .form-input:focus {
             outline: none;
             border-color: var(--primary-green);
-            box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.15), 0 4px 12px rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.15), 0 4px 12px rgba(0, 191, 255, 0.1);
             background-color: rgba(10, 10, 10, 0.8);
             transform: translateY(-1px);
         }
@@ -118,7 +118,7 @@
         }
 
         .alert-success {
-            background-color: rgba(0, 255, 136, 0.1);
+            background-color: rgba(0, 191, 255, 0.1);
             border: 1px solid var(--primary-green);
             color: var(--primary-green);
         }
@@ -143,9 +143,9 @@
                 <img th:src="@{/images/Logo.JPG}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
             </div>
             <div class="nav-menu" style="justify-self: end;">
-                <a th:href="@{/planes}" class="nav-link">Planes</a>
-                <a th:href="@{/contacto}" class="nav-link">Contacto</a>
-                <div style="position: relative; display: inline-block;">
+                <a th:href="@{/planes}" class="nav-link" th:if="${isAuthenticated == null || !isAuthenticated}">Planes</a>
+                <a th:href="@{/contacto}" class="nav-link" th:if="${isAuthenticated == null || !isAuthenticated}">Contacto</a>
+                <div style="position: relative; display: inline-block;" th:if="${isAuthenticated != null && isAuthenticated}" onmouseenter="document.getElementById('gestion-dropdown').style.display='block'" onmouseleave="document.getElementById('gestion-dropdown').style.display='none'">
                     <a href="#" class="nav-link" id="gestion-menu">Gestión</a>
                     <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background-color: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; margin-top: 0.5rem; min-width: 150px; z-index: 1000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
                         <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Roles</a>
@@ -153,7 +153,8 @@
                         <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
                     </div>
                 </div>
-                <a th:href="@{/login}" class="nav-link nav-link-login">Login</a>
+                <a th:href="@{/login}" class="nav-link nav-link-login" th:if="${isAuthenticated == null || !isAuthenticated}">Login</a>
+                <a th:href="@{/logout}" class="nav-link nav-link-login" th:if="${isAuthenticated != null && isAuthenticated}">Cerrar Sesión</a>
             </div>
         </div>
     </nav>
@@ -222,15 +223,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">
-                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
-                </div>
                 <p class="footer-tagline">Escribe en tu idioma, NCOD3 lo traduce a SQL</p>
-                <div class="footer-links">
-                    <a th:href="@{/planes}">Planes</a>
-                    <a th:href="@{/contacto}">Contacto</a>
-                    <a th:href="@{/login}">Login</a>
-                </div>
             </div>
         </div>
     </footer>

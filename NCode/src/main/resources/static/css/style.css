@@ -1,8 +1,8 @@
 /* Variables CSS */
 :root {
-    --primary-green: #00ff88;
-    --primary-green-dark: #00cc6a;
-    --primary-green-light: #33ffaa;
+    --primary-green: #00BFFF;
+    --primary-green-dark: #0088CC;
+    --primary-green-light: #33CCFF;
     --bg-dark: #0a0a0a;
     --bg-darker: #050505;
     --bg-section: #111111;
@@ -76,7 +76,7 @@ body {
     font-size: 1.8rem;
     font-weight: 800;
     color: var(--primary-green);
-    text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    text-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
     letter-spacing: -0.5px;
 }
 
@@ -87,7 +87,7 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.6));
+    filter: drop-shadow(0 0 10px rgba(0, 191, 255, 0.6));
 }
 
 .nav-menu {
@@ -137,7 +137,7 @@ body {
     background-color: var(--primary-green-light);
     color: var(--bg-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3);
 }
 
 /* Hero Section */
@@ -156,7 +156,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle at 50% 0%, rgba(0, 191, 255, 0.1) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -229,7 +229,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.1), transparent);
     transition: left 0.5s ease;
 }
 
@@ -240,7 +240,7 @@ body {
 .benefit-item:hover {
     border-color: var(--primary-green);
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 255, 136, 0.2), 0 0 0 1px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 191, 255, 0.2), 0 0 0 1px rgba(0, 191, 255, 0.1);
     background: linear-gradient(135deg, rgba(17, 17, 17, 0.95) 0%, rgba(17, 17, 17, 0.85) 100%);
 }
 
@@ -272,7 +272,7 @@ body {
     font-weight: 700;
     font-size: 1.1rem;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3), 0 0 0 0 rgba(0, 255, 136, 0.5);
+    box-shadow: 0 4px 20px rgba(0, 191, 255, 0.3), 0 0 0 0 rgba(0, 191, 255, 0.5);
     border: none;
     cursor: pointer;
     position: relative;
@@ -299,7 +299,7 @@ body {
 
 .cta-button:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 35px rgba(0, 255, 136, 0.5), 0 0 0 4px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 12px 35px rgba(0, 191, 255, 0.5), 0 0 0 4px rgba(0, 191, 255, 0.1);
     background: linear-gradient(135deg, var(--primary-green-light) 0%, var(--primary-green) 100%);
 }
 
@@ -318,7 +318,7 @@ body {
     background: var(--primary-green);
     color: var(--bg-dark);
     transform: translateY(-4px);
-    box-shadow: 0 12px 35px rgba(0, 255, 136, 0.3);
+    box-shadow: 0 12px 35px rgba(0, 191, 255, 0.3);
 }
 
 .cta-primary {
@@ -396,7 +396,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.1), transparent);
     transition: left 0.5s ease;
 }
 
@@ -407,7 +407,7 @@ body {
 .benefit-card:hover {
     border-color: var(--primary-green);
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 255, 136, 0.2), 0 0 0 1px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 191, 255, 0.2), 0 0 0 1px rgba(0, 191, 255, 0.1);
     background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.85) 100%);
 }
 

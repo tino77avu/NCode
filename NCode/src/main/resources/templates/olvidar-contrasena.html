@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - NCOD3</title>
+    <title>Olvidar Contraseña - NCOD3</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,19 +48,18 @@
         }
 
         .login-title {
-            font-size: 1.75rem;
-            font-weight: 700;
+            font-size: 2rem;
+            font-weight: 800;
             margin-bottom: 0.5rem;
-            text-align: center;
             color: var(--primary-green);
-            letter-spacing: -0.02em;
+            text-align: center;
             text-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
         }
 
         .login-subtitle {
             color: var(--text-secondary);
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             font-size: 0.95rem;
         }
 
@@ -71,63 +70,87 @@
         .form-label {
             display: block;
             color: var(--text-primary);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
             font-weight: 600;
             font-size: 0.95rem;
-            letter-spacing: 0.01em;
         }
 
         .form-input {
             width: 100%;
-            padding: 1rem 1.25rem;
+            padding: 0.875rem 1rem;
             background-color: var(--bg-dark);
             border: 1.5px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 8px;
             color: var(--text-primary);
             font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary-green);
             box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.15), 0 4px 12px rgba(0, 191, 255, 0.1);
-            background-color: rgba(10, 10, 10, 0.8);
-            transform: translateY(-1px);
-        }
-
-        .form-input::placeholder {
-            transition: opacity 0.3s ease;
-        }
-
-        .form-input:focus::placeholder {
-            opacity: 0.5;
-        }
-
-        .form-input::placeholder {
-            color: var(--text-muted);
         }
 
         .login-button {
             width: 100%;
-            padding: 0.875rem;
             margin-top: 0.5rem;
         }
 
         .forgot-password {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
 
         .forgot-password a {
             color: var(--primary-green);
             text-decoration: none;
             font-size: 0.9rem;
+            transition: color 0.3s ease;
         }
 
         .forgot-password a:hover {
+            color: var(--primary-green-light);
             text-decoration: underline;
+        }
+
+        .back-to-login {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .back-to-login a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-to-login a:hover {
+            color: var(--primary-green);
+        }
+
+        .mensaje {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .mensaje-exito {
+            background-color: rgba(0, 191, 255, 0.1);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .mensaje-error {
+            background-color: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff4444;
         }
         
         /* Estilos para mensajes flotantes */
@@ -190,9 +213,62 @@
         @media (max-width: 768px) {
             #mensajeContainer {
                 bottom: 15px;
-                max-width: 95%;
-                min-width: 280px;
+                width: calc(100% - 20px);
+                max-width: calc(100% - 20px);
+                min-width: auto;
             }
+            
+            #mensajeContainer .mensaje {
+                min-width: auto;
+                width: 100%;
+                max-width: 100%;
+                padding: 0.875rem 1.25rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        .mensaje-procesando {
+            background-color: rgba(0, 191, 255, 0.1);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .spinner {
+            border: 2px solid rgba(0, 191, 255, 0.3);
+            border-top: 2px solid var(--primary-green);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .button-loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .button-loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
     </style>
 </head>
@@ -225,34 +301,33 @@
         </div>
     </nav>
 
-    <!-- Sección de Login -->
+    <!-- Sección de Olvidar Contraseña -->
     <section class="login-container">
         <div class="container">
             <div class="login-box">
-                <h1 class="login-title">Iniciar Sesión</h1>
-                <p class="login-subtitle">Accede a tu cuenta de NCOD3</p>
+                <h1 class="login-title">Recuperar Contraseña</h1>
+                <p class="login-subtitle">Ingresa tu correo electrónico. Te enviaremos un código de verificación para recuperar tu contraseña.</p>
                 
-                <form th:action="@{/login}" method="post">
-                    <div class="form-group">
-                        <label for="username" class="form-label">Usuario</label>
-                        <input type="text" id="username" name="username" class="form-input" placeholder="Ingresa tu usuario" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" id="password" name="password" class="form-input" placeholder="Ingresa tu contraseña" required>
-                    </div>
-                    
-                    <button type="submit" class="cta-button login-button">Iniciar Sesión</button>
-                </form>
-                
-                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">¿No tienes una cuenta?</p>
-                    <a th:href="@{/registro}" class="cta-button cta-secondary" style="display: inline-block; width: auto; padding: 0.875rem 2rem;">Registrarse</a>
+                <div id="mensajeContainer"></div>
+                <div th:if="${mensajeError}" class="mensaje mensaje-error" th:text="${mensajeError}" style="display: none;"></div>
+                <div th:if="${mensajeExito}" class="mensaje mensaje-exito" th:utext="${mensajeExito}" style="display: none;"></div>
+                <div id="mensajeProcesando" class="mensaje mensaje-procesando" style="display: none;">
+                    <div class="spinner"></div>
+                    <span>Enviando correo electrónico, por favor espera...</span>
                 </div>
                 
-                <div class="forgot-password">
-                    <a th:href="@{/olvidar-contrasena}">¿Olvidaste tu contraseña?</a>
+                <form th:action="@{/olvidar-contrasena}" method="post" id="formOlvidarContrasena">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input type="email" id="email" name="email" class="form-input" 
+                               placeholder="Ingresa tu correo electrónico" required>
+                    </div>
+                    
+                    <button type="submit" class="cta-button login-button" id="btnEnviar">Validar Correo</button>
+                </form>
+                
+                <div class="back-to-login">
+                    <a th:href="@{/login}">← Volver al Login</a>
                 </div>
             </div>
         </div>
@@ -273,15 +348,34 @@
             <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 339.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56 81.2 56 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
         </svg>
     </a>
-    
-    <!-- Contenedor para mensajes flotantes -->
-    <div id="mensajeContainer"></div>
-    
-    <!-- Mensajes flash del servidor (ocultos, se muestran con JavaScript) -->
-    <div th:if="${mensajeExito}" data-mensaje-exito="true" style="display: none;" th:text="${mensajeExito}"></div>
-    <div th:if="${mensajeError}" data-mensaje-error="true" style="display: none;" th:text="${mensajeError}"></div>
-    
+
     <script>
+        // Mostrar mensaje de procesando cuando se envía el formulario
+        document.getElementById('formOlvidarContrasena').addEventListener('submit', function(e) {
+            const btnEnviar = document.getElementById('btnEnviar');
+            const mensajeProcesando = document.getElementById('mensajeProcesando');
+            const emailInput = document.getElementById('email');
+            
+            // Validar que el email no esté vacío
+            if (emailInput.value.trim() === '') {
+                e.preventDefault();
+                alert('Por favor, ingresa tu correo electrónico');
+                emailInput.focus();
+                return false;
+            }
+            
+            // Mostrar mensaje de procesando
+            mensajeProcesando.style.display = 'flex';
+            
+            // Deshabilitar botón y mostrar estado de carga
+            btnEnviar.disabled = true;
+            btnEnviar.classList.add('button-loading');
+            btnEnviar.textContent = 'Enviando...';
+            
+            // Hacer el campo de email readonly (no disabled, para que se envíe el valor)
+            emailInput.readOnly = true;
+        });
+
         // Función para mostrar mensaje flotante
         function mostrarMensaje(mensaje, tipo) {
             const mensajeContainer = document.getElementById('mensajeContainer');
@@ -299,7 +393,7 @@
             // Agregar al contenedor (al inicio para que aparezca arriba)
             mensajeContainer.insertBefore(mensajeDiv, mensajeContainer.firstChild);
             
-            // Asegurar que el mensaje sea visible
+            // Asegurar que el mensaje sea visible (scroll automático si es necesario)
             mensajeDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             
             // Ocultar después de 3 segundos (más tiempo para mensajes de éxito)
@@ -313,23 +407,32 @@
             }, tiempoMostrar);
         }
         
-        // Mostrar mensajes flash del servidor si existen
+        // Mostrar mensajes del servidor si existen
         window.addEventListener('DOMContentLoaded', function() {
-            // Usar Thymeleaf para obtener los mensajes flash
-            const mensajeExitoDiv = document.querySelector('[data-mensaje-exito]');
-            const mensajeErrorDiv = document.querySelector('[data-mensaje-error]');
+            const mensajeExito = document.querySelector('.mensaje-exito');
+            const mensajeError = document.querySelector('.mensaje-error');
             
-            if (mensajeExitoDiv) {
-                const mensajeExito = mensajeExitoDiv.textContent || mensajeExitoDiv.innerText || mensajeExitoDiv.getAttribute('data-mensaje-exito');
-                if (mensajeExito && mensajeExito.trim() !== '' && mensajeExito !== 'null') {
-                    mostrarMensaje(mensajeExito.trim(), 'exito');
+            // Verificar mensaje de éxito (puede estar oculto pero con contenido)
+            if (mensajeExito && mensajeExito.textContent.trim() !== '') {
+                const computedStyle = window.getComputedStyle(mensajeExito);
+                // Si el elemento existe y tiene contenido, mostrarlo aunque esté oculto
+                if (computedStyle.display === 'none' || mensajeExito.style.display === 'none') {
+                    // El mensaje viene del servidor, mostrarlo como flotante
+                    mostrarMensaje(mensajeExito.innerHTML, 'exito');
+                } else if (computedStyle.display !== 'none') {
+                    mostrarMensaje(mensajeExito.innerHTML, 'exito');
                 }
             }
             
-            if (mensajeErrorDiv) {
-                const mensajeError = mensajeErrorDiv.textContent || mensajeErrorDiv.innerText || mensajeErrorDiv.getAttribute('data-mensaje-error');
-                if (mensajeError && mensajeError.trim() !== '' && mensajeError !== 'null') {
-                    mostrarMensaje(mensajeError.trim(), 'error');
+            // Verificar mensaje de error (puede estar oculto pero con contenido)
+            if (mensajeError && mensajeError.textContent.trim() !== '') {
+                const computedStyle = window.getComputedStyle(mensajeError);
+                // Si el elemento existe y tiene contenido, mostrarlo aunque esté oculto
+                if (computedStyle.display === 'none' || mensajeError.style.display === 'none') {
+                    // El mensaje viene del servidor, mostrarlo como flotante
+                    mostrarMensaje(mensajeError.textContent, 'error');
+                } else if (computedStyle.display !== 'none') {
+                    mostrarMensaje(mensajeError.textContent, 'error');
                 }
             }
         });

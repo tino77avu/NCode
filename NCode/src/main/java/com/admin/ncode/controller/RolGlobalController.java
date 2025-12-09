@@ -19,6 +19,7 @@ public class RolGlobalController {
 
     @GetMapping
     public String listarRoles(Model model) {
+        model.addAttribute("isAuthenticated", true);
         List<RolGlobal> roles = rolGlobalRepository.findAllByOrderByRolGlobalIdAsc();
         model.addAttribute("roles", roles);
         model.addAttribute("rol", new RolGlobal());
