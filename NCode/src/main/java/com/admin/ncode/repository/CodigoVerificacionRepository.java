@@ -17,7 +17,7 @@ public interface CodigoVerificacionRepository extends JpaRepository<CodigoVerifi
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO codigoverificacion (usuarioid, empresaid, codigo, tipo, estado, intentosusados, maxintentos, fechaexpiracion, ipgeneracion) " +
-                   "VALUES (:usuarioid, :empresaid, :codigo, CAST(:tipo AS codigoverificacion_tipo), CAST(:estado AS codigoverificacion_estado), :intentosusados, :maxintentos, :fechaexpiracion, :ipgeneracion)", 
+                   "VALUES (:usuarioid, :empresaid, :codigo, :tipo, :estado, :intentosusados, :maxintentos, :fechaexpiracion, :ipgeneracion)", 
            nativeQuery = true)
     void insertCodigoVerificacion(@Param("usuarioid") Long usuarioId,
                                   @Param("empresaid") Long empresaId,
@@ -38,7 +38,7 @@ public interface CodigoVerificacionRepository extends JpaRepository<CodigoVerifi
     
     @Modifying
     @Transactional
-    @Query(value = "UPDATE codigoverificacion SET estado = CAST(:estado AS codigoverificacion_estado), usadoen = :usadoEn WHERE codigoid = :codigoId", nativeQuery = true)
+    @Query(value = "UPDATE codigoverificacion SET estado = :estado, usadoen = :usadoEn WHERE codigoid = :codigoId", nativeQuery = true)
     void marcarComoUsado(@Param("codigoId") Long codigoId, @Param("estado") String estado, @Param("usadoEn") LocalDateTime usadoEn);
 }
 

@@ -24,11 +24,11 @@ public class CodigoVerificacion {
     private String codigo;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", nullable = false, columnDefinition = "codigoverificacion_tipo")
+    @Column(name = "tipo", nullable = false, length = 50)
     private TipoCodigo tipo;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", nullable = false, columnDefinition = "codigoverificacion_estado")
+    @Column(name = "estado", nullable = false, length = 50)
     private EstadoCodigo estado = EstadoCodigo.GENERADO;
     
     @Column(name = "intentosusados", nullable = false)
