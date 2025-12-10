@@ -2,6 +2,7 @@ package com.admin.ncode.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -32,6 +33,9 @@ public class EmailService {
 
             mailSender.send(message);
             System.out.println("Correo enviado exitosamente a: " + toEmail);
+            System.out.println("  - Remitente: " + FROM_EMAIL + " (" + FROM_NAME + ")");
+            System.out.println("  - Destinatario: " + toEmail);
+            System.out.println("  - Asunto: Código de Verificación - Recuperación de Contraseña");
         } catch (MessagingException | UnsupportedEncodingException e) {
             System.err.println("Error al enviar el correo electrónico a " + toEmail + ": " + e.getMessage());
             e.printStackTrace();
