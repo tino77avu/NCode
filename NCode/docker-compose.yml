@@ -10,7 +10,7 @@ services:
       - "8080:8080"
     environment:
       - PORT=8080
-      - SERVER_CONTEXT_PATH=/NCode
+      - SERVER_CONTEXT_PATH=/NCod3
       - DATABASE_URL=jdbc:postgresql://postgres:5432/ncodegestion
       - DATABASE_USERNAME=ncode_user
       - DATABASE_PASSWORD=N0l0s4br4s.
