@@ -30,6 +30,17 @@
             background-color: rgba(10, 10, 10, 0.8);
             transform: translateY(-1px);
         }
+        
+        .contact-form input.error,
+        .contact-form textarea.error {
+            border-color: #ff4444;
+        }
+        
+        .contact-form input.error:focus,
+        .contact-form textarea.error:focus {
+            border-color: #ff4444;
+            box-shadow: 0 0 0 4px rgba(255, 68, 68, 0.15), 0 4px 12px rgba(255, 68, 68, 0.1);
+        }
 
         .contact-form input::placeholder,
         .contact-form textarea::placeholder {
@@ -139,30 +150,61 @@
                 </div>
                 
                 <div style="background-color: var(--bg-section); padding: 3rem; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-                    <form th:action="@{/contacto}" method="post" class="contact-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <form th:action="@{/contacto}" th:object="${contactoRequest}" method="post" class="contact-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div th:if="${#fields.hasErrors('*')}" class="alert-message" style="background-color: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <p style="color: #ff4444; margin: 0; font-weight: 600;">Por favor, corrige los errores en el formulario:</p>
+                            <ul style="color: #ff4444; margin: 0.5rem 0 0 1.5rem; padding: 0;">
+                                <li th:each="error : ${#fields.errors('*')}" th:text="${error}"></li>
+                            </ul>
+                        </div>
                         <div class="form-group">
                             <label for="nombre">Nombre completo *</label>
-                            <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre completo">
+                            <input type="text" id="nombre" th:field="*{nombre}" 
+                                   th:classappend="${#fields.hasErrors('nombre')} ? 'error'" 
+                                   required placeholder="Ingresa tu nombre completo">
+                            <span th:if="${#fields.hasErrors('nombre')}" 
+                                  th:errors="*{nombre}" 
+                                  style="color: #ff4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;"></span>
                         </div>
                         
                         <div class="form-group">
                             <label for="email">Correo electrónico *</label>
-                            <input type="email" id="email" name="email" required placeholder="tu@email.com">
+                            <input type="email" id="email" th:field="*{email}" 
+                                   th:classappend="${#fields.hasErrors('email')} ? 'error'" 
+                                   required placeholder="tu@email.com">
+                            <span th:if="${#fields.hasErrors('email')}" 
+                                  th:errors="*{email}" 
+                                  style="color: #ff4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;"></span>
                         </div>
                         
                         <div class="form-group">
                             <label for="telefono">Teléfono</label>
-                            <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567">
+                            <input type="tel" id="telefono" th:field="*{telefono}" 
+                                   th:classappend="${#fields.hasErrors('telefono')} ? 'error'" 
+                                   placeholder="+57 300 123 4567">
+                            <span th:if="${#fields.hasErrors('telefono')}" 
+                                  th:errors="*{telefono}" 
+                                  style="color: #ff4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;"></span>
                         </div>
                         
                         <div class="form-group">
                             <label for="asunto">Asunto *</label>
-                            <input type="text" id="asunto" name="asunto" required placeholder="¿En qué podemos ayudarte?">
+                            <input type="text" id="asunto" th:field="*{asunto}" 
+                                   th:classappend="${#fields.hasErrors('asunto')} ? 'error'" 
+                                   required placeholder="¿En qué podemos ayudarte?">
+                            <span th:if="${#fields.hasErrors('asunto')}" 
+                                  th:errors="*{asunto}" 
+                                  style="color: #ff4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;"></span>
                         </div>
                         
                         <div class="form-group">
                             <label for="mensaje">Mensaje *</label>
-                            <textarea id="mensaje" name="mensaje" required rows="6" placeholder="Escribe tu mensaje aquí..."></textarea>
+                            <textarea id="mensaje" th:field="*{mensaje}" 
+                                      th:classappend="${#fields.hasErrors('mensaje')} ? 'error'" 
+                                      required rows="6" placeholder="Escribe tu mensaje aquí..."></textarea>
+                            <span th:if="${#fields.hasErrors('mensaje')}" 
+                                  th:errors="*{mensaje}" 
+                                  style="color: #ff4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;"></span>
                         </div>
                         
                         <button type="submit" class="cta-button" style="width: 100%; margin-top: 1rem;">Enviar mensaje</button>
