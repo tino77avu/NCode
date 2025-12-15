@@ -33,7 +33,7 @@ public class EmailService {
     @Value("${SENDGRID_API_KEY:}")
     private String sendGridApiKey;
 
-    @Value("${SENDGRID_FROM_EMAIL:soporte@ncod3.com}")
+    @Value("${SENDGRID_FROM_EMAIL:albertinovillar@ncod3.com}")
     private String fromEmail;
 
     @Value("${SENDGRID_FROM_NAME:NCOD3 Soporte}")
