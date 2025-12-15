@@ -1,82 +1,172 @@
 package com.admin.ncode.service;
 
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @Service
 public class EmailService {
 
-    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+
+    @Autowired(required = false)
     private JavaMailSender mailSender;
+
+    // SendGrid - Solo se usa si SENDGRID_API_KEY está configurado (típicamente en Render)
+    @Value("${SENDGRID_API_KEY:}")
+    private String sendGridApiKey;
+
+    @Value("${SENDGRID_FROM_EMAIL:soporte@ncod3.com}")
+    private String fromEmail;
+
+    @Value("${SENDGRID_FROM_NAME:NCOD3 Soporte}")
+    private String fromName;
+    
+    // Para desarrollo local: usar SMTP (Zoho)
+    // Para Render: usar SendGrid (configurar SENDGRID_API_KEY)
 
     // Configuración anterior (comentada)
     //private static final String FROM_EMAIL = "ncodeactive@indigo-negocios.com";
     //private static final String FROM_NAME = "NCode Licenciamiento";
     
-    // Configuración nueva - Zoho
-    private static final String FROM_EMAIL = "soporte@ncod3.com";
-    private static final String FROM_NAME = "NCOD3 Soporte";
+    // Configuración nueva - Zoho (fallback si SendGrid no está disponible)
+    private static final String FALLBACK_FROM_EMAIL = "soporte@ncod3.com";
+    private static final String FALLBACK_FROM_NAME = "NCOD3 Soporte";
 
     public void enviarCodigoVerificacion(String toEmail, String codigo) {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        // Intentar usar SendGrid si está configurado
+        if (sendGridApiKey != null && !sendGridApiKey.isEmpty()) {
+            try {
+                enviarConSendGrid(toEmail, "Código de Verificación - Recuperación de Contraseña", 
+                                 construirMensajeEmail(codigo));
+                logger.info("Correo enviado exitosamente con SendGrid a: {}", toEmail);
+                return;
+            } catch (Exception e) {
+                logger.error("Error al enviar con SendGrid, intentando con SMTP: {}", e.getMessage());
+                // Continuar con SMTP como fallback
+            }
+        }
+        
+        // Fallback a SMTP (para desarrollo local)
+        if (mailSender != null) {
+            try {
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(FROM_EMAIL, FROM_NAME);
-            helper.setTo(toEmail);
-            helper.setSubject("Código de Verificación - Recuperación de Contraseña");
+                String emailFrom = fromEmail != null && !fromEmail.isEmpty() ? fromEmail : FALLBACK_FROM_EMAIL;
+                String nameFrom = fromName != null && !fromName.isEmpty() ? fromName : FALLBACK_FROM_NAME;
+                
+                helper.setFrom(emailFrom, nameFrom);
+                helper.setTo(toEmail);
+                helper.setSubject("Código de Verificación - Recuperación de Contraseña");
 
-            String htmlContent = construirMensajeEmail(codigo);
-            helper.setText(htmlContent, true);
+                String htmlContent = construirMensajeEmail(codigo);
+                helper.setText(htmlContent, true);
 
-            mailSender.send(message);
-            System.out.println("Correo enviado exitosamente a: " + toEmail);
-            System.out.println("  - Remitente: " + FROM_EMAIL + " (" + FROM_NAME + ")");
-            System.out.println("  - Destinatario: " + toEmail);
-            System.out.println("  - Asunto: Código de Verificación - Recuperación de Contraseña");
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            System.err.println("Error al enviar el correo electrónico a " + toEmail + ": " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
-        } catch (Exception e) {
-            System.err.println("Error inesperado al enviar el correo electrónico a " + toEmail + ": " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+                mailSender.send(message);
+                logger.info("Correo enviado exitosamente con SMTP a: {}", toEmail);
+            } catch (MessagingException | UnsupportedEncodingException e) {
+                logger.error("Error al enviar el correo electrónico a {}: {}", toEmail, e.getMessage(), e);
+                throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+            } catch (Exception e) {
+                logger.error("Error inesperado al enviar el correo electrónico a {}: {}", toEmail, e.getMessage(), e);
+                throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+            }
+        } else {
+            throw new RuntimeException("No hay servicio de email configurado (SendGrid o SMTP)");
         }
     }
 
     public void enviarCodigoDemo(String toEmail, String codigo, String nombre) {
+        // Intentar usar SendGrid si está configurado
+        if (sendGridApiKey != null && !sendGridApiKey.isEmpty()) {
+            try {
+                enviarConSendGrid(toEmail, "Código de Verificación - Demo NCOD3", 
+                                 construirMensajeEmailDemo(codigo, nombre));
+                logger.info("Correo de demo enviado exitosamente con SendGrid a: {}", toEmail);
+                return;
+            } catch (Exception e) {
+                logger.error("Error al enviar con SendGrid, intentando con SMTP: {}", e.getMessage());
+                // Continuar con SMTP como fallback
+            }
+        }
+        
+        // Fallback a SMTP (para desarrollo local)
+        if (mailSender != null) {
+            try {
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+                String emailFrom = fromEmail != null && !fromEmail.isEmpty() ? fromEmail : FALLBACK_FROM_EMAIL;
+                String nameFrom = fromName != null && !fromName.isEmpty() ? fromName : FALLBACK_FROM_NAME;
+                
+                helper.setFrom(emailFrom, nameFrom);
+                helper.setTo(toEmail);
+                helper.setSubject("Código de Verificación - Demo NCOD3");
+
+                String htmlContent = construirMensajeEmailDemo(codigo, nombre);
+                helper.setText(htmlContent, true);
+
+                mailSender.send(message);
+                logger.info("Correo de demo enviado exitosamente con SMTP a: {}", toEmail);
+            } catch (MessagingException | UnsupportedEncodingException e) {
+                logger.error("Error al enviar el correo de demo a {}: {}", toEmail, e.getMessage(), e);
+                throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+            } catch (Exception e) {
+                logger.error("Error inesperado al enviar el correo de demo a {}: {}", toEmail, e.getMessage(), e);
+                throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+            }
+        } else {
+            throw new RuntimeException("No hay servicio de email configurado (SendGrid o SMTP)");
+        }
+    }
+    
+    /**
+     * Envía un email usando SendGrid API
+     */
+    private void enviarConSendGrid(String toEmail, String subject, String htmlContent) throws IOException {
+        Email from = new Email(fromEmail != null && !fromEmail.isEmpty() ? fromEmail : FALLBACK_FROM_EMAIL, 
+                              fromName != null && !fromName.isEmpty() ? fromName : FALLBACK_FROM_NAME);
+        Email to = new Email(toEmail);
+        Content content = new Content("text/html", htmlContent);
+        Mail mail = new Mail(from, subject, to, content);
+
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom(FROM_EMAIL, FROM_NAME);
-            helper.setTo(toEmail);
-            helper.setSubject("Código de Verificación - Demo NCOD3");
-
-            String htmlContent = construirMensajeEmailDemo(codigo, nombre);
-            helper.setText(htmlContent, true);
-
-            mailSender.send(message);
-            System.out.println("Correo de demo enviado exitosamente a: " + toEmail);
-            System.out.println("  - Remitente: " + FROM_EMAIL + " (" + FROM_NAME + ")");
-            System.out.println("  - Destinatario: " + toEmail);
-            System.out.println("  - Asunto: Código de Verificación - Demo NCOD3");
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            System.err.println("Error al enviar el correo de demo a " + toEmail + ": " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
-        } catch (Exception e) {
-            System.err.println("Error inesperado al enviar el correo de demo a " + toEmail + ": " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            
+            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+                logger.info("Email enviado exitosamente con SendGrid. Status: {}", response.getStatusCode());
+            } else {
+                logger.error("Error al enviar email con SendGrid. Status: {}, Body: {}", 
+                           response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Error al enviar email con SendGrid: " + response.getStatusCode() + " - " + response.getBody());
+            }
+        } catch (IOException ex) {
+            logger.error("Error de IO al enviar email con SendGrid: {}", ex.getMessage(), ex);
+            throw ex;
         }
     }
 
