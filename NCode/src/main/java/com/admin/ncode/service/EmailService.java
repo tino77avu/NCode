@@ -16,8 +16,13 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    private static final String FROM_EMAIL = "ncodeactive@indigo-negocios.com";
-    private static final String FROM_NAME = "NCode Licenciamiento";
+    // Configuración anterior (comentada)
+    //private static final String FROM_EMAIL = "ncodeactive@indigo-negocios.com";
+    //private static final String FROM_NAME = "NCode Licenciamiento";
+    
+    // Configuración nueva - Zoho
+    private static final String FROM_EMAIL = "soporte@ncod3.com";
+    private static final String FROM_NAME = "NCOD3 Soporte";
 
     public void enviarCodigoVerificacion(String toEmail, String codigo) {
         try {
@@ -42,6 +47,34 @@ public class EmailService {
             throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
         } catch (Exception e) {
             System.err.println("Error inesperado al enviar el correo electrónico a " + toEmail + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+        }
+    }
+
+    public void enviarCodigoDemo(String toEmail, String codigo, String nombre) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(FROM_EMAIL, FROM_NAME);
+            helper.setTo(toEmail);
+            helper.setSubject("Código de Verificación - Demo NCOD3");
+
+            String htmlContent = construirMensajeEmailDemo(codigo, nombre);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            System.out.println("Correo de demo enviado exitosamente a: " + toEmail);
+            System.out.println("  - Remitente: " + FROM_EMAIL + " (" + FROM_NAME + ")");
+            System.out.println("  - Destinatario: " + toEmail);
+            System.out.println("  - Asunto: Código de Verificación - Demo NCOD3");
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            System.err.println("Error al enviar el correo de demo a " + toEmail + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
+        } catch (Exception e) {
+            System.err.println("Error inesperado al enviar el correo de demo a " + toEmail + ": " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
         }
@@ -75,6 +108,44 @@ public class EmailService {
                 "</div>" +
                 "<p>Este código es válido por 15 minutos. Si no solicitaste este cambio, puedes ignorar este correo.</p>" +
                 "<p>Saludos,<br><strong>Equipo NCode Licenciamiento</strong></p>" +
+                "</div>" +
+                "<div class='footer'>" +
+                "<p>Este es un correo automático, por favor no respondas a este mensaje.</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+    }
+
+    private String construirMensajeEmailDemo(String codigo, String nombre) {
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<head>" +
+                "<meta charset='UTF-8'>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }" +
+                ".container { max-width: 600px; margin: 0 auto; padding: 20px; }" +
+                ".header { background: linear-gradient(135deg, #00BFFF 0%, #0088CC 100%); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }" +
+                ".content { background: #f9f9f9; padding: 30px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px; }" +
+                ".code-box { background: #fff; border: 2px solid #00BFFF; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }" +
+                ".code { font-size: 24px; font-weight: bold; color: #00BFFF; letter-spacing: 3px; font-family: 'Courier New', monospace; }" +
+                ".footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'>" +
+                "<h1>NCOD3 - Código de Verificación para Demo</h1>" +
+                "</div>" +
+                "<div class='content'>" +
+                "<p>Hola " + (nombre != null ? nombre : "") + ",</p>" +
+                "<p>Gracias por tu interés en probar NCOD3. Hemos recibido tu solicitud de demo.</p>" +
+                "<p>Utiliza el siguiente código de verificación para acceder al demo:</p>" +
+                "<div class='code-box'>" +
+                "<div class='code'>" + codigo + "</div>" +
+                "</div>" +
+                "<p>Este código es válido por 15 minutos. Nuestro equipo se pondrá en contacto contigo pronto para coordinar la demostración.</p>" +
+                "<p>Saludos,<br><strong>Equipo NCOD3</strong></p>" +
                 "</div>" +
                 "<div class='footer'>" +
                 "<p>Este es un correo automático, por favor no respondas a este mensaje.</p>" +

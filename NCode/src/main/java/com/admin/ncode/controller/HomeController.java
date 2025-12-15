@@ -1,6 +1,7 @@
 package com.admin.ncode.controller;
 
 import com.admin.ncode.dto.ContactoRequest;
+import com.admin.ncode.dto.DemoRequest;
 import com.admin.ncode.dto.LoginRequest;
 import com.admin.ncode.entity.Usuario;
 import com.admin.ncode.repository.UsuarioRepository;
@@ -47,6 +48,10 @@ public class HomeController {
     public String index(Model model, HttpSession session) {
         Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
         model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
+        // Agregar demoRequest si no existe (para el formulario del modal)
+        if (!model.containsAttribute("demoRequest")) {
+            model.addAttribute("demoRequest", new com.admin.ncode.dto.DemoRequest());
+        }
         return "index";
     }
 
