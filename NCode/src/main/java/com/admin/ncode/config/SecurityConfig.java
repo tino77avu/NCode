@@ -18,6 +18,9 @@ public class SecurityConfig {
     @Autowired(required = false)
     private SessionSecurityFilter sessionSecurityFilter;
 
+    @Autowired(required = false)
+    private CustomLogoutSuccessHandler logoutSuccessHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -43,6 +46,7 @@ public class SecurityConfig {
                     "/planes",
                     "/olvidar-contrasena",
                     "/cambiar-contrasena",
+                    "/demo/**",
                     "/css/**",
                     "/images/**",
                     "/js/**",
@@ -62,6 +66,19 @@ public class SecurityConfig {
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
             )
+            
+            // Configuración de logout
+            .logout(logout -> {
+                logout.logoutUrl("/logout")
+                      .invalidateHttpSession(true)
+                      .deleteCookies("JSESSIONID")
+                      .permitAll();
+                if (logoutSuccessHandler != null) {
+                    logout.logoutSuccessHandler(logoutSuccessHandler);
+                } else {
+                    logout.logoutSuccessUrl("/");
+                }
+            })
             
             // Headers de seguridad
             .headers(headers -> headers

@@ -229,7 +229,10 @@
                     </div>
                 </div>
                 <a th:href="@{/login}" class="nav-link nav-link-login" th:if="${isAuthenticated == null || !isAuthenticated}">Login</a>
-                <a th:href="@{/logout}" class="nav-link nav-link-login" th:if="${isAuthenticated != null && isAuthenticated}">Cerrar Sesión</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;" th:if="${isAuthenticated != null && isAuthenticated}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="nav-link nav-link-login" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit; font: inherit; text-decoration: none;">Cerrar Sesión</button>
+                </form>
             </div>
         </div>
     </nav>

@@ -292,7 +292,10 @@
                         <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
                     </div>
                 </div>
-                <a th:href="@{/logout}" class="nav-link nav-link-login">Cerrar Sesión</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="nav-link nav-link-login" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit; font: inherit; text-decoration: none;">Cerrar Sesión</button>
+                </form>
             </div>
         </div>
     </nav>

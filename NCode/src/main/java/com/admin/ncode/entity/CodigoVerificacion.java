@@ -50,7 +50,8 @@ public class CodigoVerificacion {
     private String ipGeneracion;
     
     public enum TipoCodigo {
-        RESET_CLAVE
+        RESET_CLAVE,
+        DEMO
     }
     
     public enum EstadoCodigo {

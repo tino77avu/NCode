@@ -45,12 +45,15 @@ public class HomeController {
     private final RateLimiter rateLimiter = new RateLimiter();
 
     @GetMapping("/")
-    public String index(Model model, HttpSession session) {
+    public String index(Model model, HttpSession session, @RequestParam(required = false) String mensajeExito) {
         Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
         model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
         // Agregar demoRequest si no existe (para el formulario del modal)
         if (!model.containsAttribute("demoRequest")) {
             model.addAttribute("demoRequest", new com.admin.ncode.dto.DemoRequest());
+        }
+        if (mensajeExito != null && !mensajeExito.isEmpty()) {
+            model.addAttribute("mensajeExito", mensajeExito);
         }
         return "index";
     }
@@ -224,11 +227,4 @@ public class HomeController {
         return "planes";
     }
     
-    @GetMapping("/logout")
-    public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
-        // Invalidar la sesión
-        session.invalidate();
-        redirectAttributes.addFlashAttribute("mensajeExito", "Sesión cerrada exitosamente");
-        return "redirect:/";
-    }
 }
