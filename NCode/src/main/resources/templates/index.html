@@ -270,11 +270,18 @@
                     </div>
                 </div>
 
-                <a href="#demo" class="cta-button" onclick="event.preventDefault(); abrirModalDemo();">Prueba el demo NCOD3</a>
+                <a href="#demo" class="cta-button" onclick="event.preventDefault(); abrirModalDemo();" th:if="${isAuthenticated == null || !isAuthenticated}">Prueba el demo NCOD3</a>
             </div>
         </div>
     </section>
 
+    <!-- Mensajes de éxito/error fuera del modal (para cuando el usuario está autenticado) -->
+    <div th:if="${isAuthenticated != null && isAuthenticated && mensajeExito != null}" 
+         id="mensajeExitoFlotante"
+         class="demo-success-message" 
+         style="position: fixed; top: 80px; right: 20px; z-index: 10000; max-width: 400px; padding: 1rem; border-radius: 8px; background: linear-gradient(135deg, #00BFFF 0%, #0088CC 100%); color: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); transition: opacity 0.3s ease-out;"
+         th:text="${mensajeExito}"></div>
+    
     <!-- Modal de Demo -->
     <div id="demoModal" class="demo-modal">
         <div class="demo-modal-content">
@@ -283,8 +290,16 @@
                 <button class="demo-close" onclick="cerrarModalDemo()">&times;</button>
             </div>
             
-            <div th:if="${mensajeExito != null}" class="demo-success-message" data-mensaje-exito="true" th:text="${mensajeExito}"></div>
-            <div th:if="${mensajeError != null}" class="demo-error-message" data-mensaje-error="true" style="background-color: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;" th:text="${mensajeError}"></div>
+            <!-- Mensajes solo dentro del modal si el usuario NO está autenticado -->
+            <div th:if="${(isAuthenticated == null || !isAuthenticated) && mensajeExito != null}" 
+                 class="demo-success-message" 
+                 data-mensaje-exito="true" 
+                 th:text="${mensajeExito}"></div>
+            <div th:if="${(isAuthenticated == null || !isAuthenticated) && mensajeError != null}" 
+                 class="demo-error-message" 
+                 data-mensaje-error="true" 
+                 style="background-color: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;" 
+                 th:text="${mensajeError}"></div>
             
             <form th:action="@{/demo/solicitar}" th:object="${demoRequest}" method="post" id="demoForm">
                 <div th:if="${#fields.hasErrors('*')}" class="demo-error-message" style="background-color: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
@@ -376,8 +391,30 @@
             document.body.style.overflow = 'auto';
         }
         
-        // Abrir modal si hay un hash #demo en la URL o si hay mensajes flash
+        // Ocultar mensaje de éxito después de 1 segundo (si el usuario está autenticado)
         window.addEventListener('DOMContentLoaded', function() {
+            const mensajeExitoFlotante = document.getElementById('mensajeExitoFlotante');
+            if (mensajeExitoFlotante) {
+                setTimeout(function() {
+                    mensajeExitoFlotante.style.opacity = '0';
+                    setTimeout(function() {
+                        mensajeExitoFlotante.remove();
+                    }, 300); // Esperar a que termine la animación de fade out
+                }, 1000); // Ocultar después de 1 segundo
+            }
+        });
+        
+        // Abrir modal si hay un hash #demo en la URL o si hay mensajes flash (solo si no está autenticado)
+        window.addEventListener('DOMContentLoaded', function() {
+            // Verificar si el usuario está autenticado
+            const isAuthenticated = /*[[${isAuthenticated}]]*/ false;
+            
+            // NUNCA abrir el modal si el usuario está autenticado
+            if (isAuthenticated) {
+                return; // No abrir el modal en absoluto si está autenticado
+            }
+            
+            // Solo abrir el modal si el usuario NO está autenticado
             if (window.location.hash === '#demo') {
                 abrirModalDemo();
             }

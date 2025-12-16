@@ -13,6 +13,10 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,16 +49,14 @@ public class HomeController {
     private final RateLimiter rateLimiter = new RateLimiter();
 
     @GetMapping("/")
-    public String index(Model model, HttpSession session, @RequestParam(required = false) String mensajeExito) {
+    public String index(Model model, HttpSession session) {
         Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
         model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
         // Agregar demoRequest si no existe (para el formulario del modal)
         if (!model.containsAttribute("demoRequest")) {
             model.addAttribute("demoRequest", new com.admin.ncode.dto.DemoRequest());
         }
-        if (mensajeExito != null && !mensajeExito.isEmpty()) {
-            model.addAttribute("mensajeExito", mensajeExito);
-        }
+        // Los mensajes flash se agregan automáticamente por Spring si existen
         return "index";
     }
 
@@ -164,9 +166,27 @@ public class HomeController {
             LocalDateTime ahora = LocalDateTime.now();
             usuarioRepository.updateUltimoLogin(usuario.getUsuarioId(), ahora);
             
+            // Crear Authentication para Spring Security ANTES de invalidar la sesión
+            java.util.Collection<org.springframework.security.core.GrantedAuthority> authorities = 
+                java.util.Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                usuario.getEmail(), 
+                null, 
+                authorities
+            );
+            
             // Regenerar ID de sesión para prevenir session fixation
             session.invalidate();
             session = request.getSession(true);
+            
+            // Establecer Authentication en SecurityContext
+            org.springframework.security.core.context.SecurityContext securityContext = 
+                SecurityContextHolder.createEmptyContext();
+            securityContext.setAuthentication(authentication);
+            SecurityContextHolder.setContext(securityContext);
+            
+            // Guardar SecurityContext en la sesión HTTP (Spring Security lo busca con esta clave)
+            session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
             
             // Guardar usuario en sesión
             session.setAttribute("usuario", usuario);

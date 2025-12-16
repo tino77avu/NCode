@@ -57,7 +57,7 @@ Configura las siguientes variables de entorno en el panel de Render:
 
 ```
 PORT=8080
-SERVER_CONTEXT_PATH=/NCod3
+SERVER_CONTEXT_PATH=/
 DATABASE_URL=jdbc:mysql://tu-host-mysql:3306/ncodegestion?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 DATABASE_USERNAME=tu_usuario
 DATABASE_PASSWORD=tu_contraseña
@@ -86,7 +86,7 @@ jdbc:mysql://dpg-xxxxx-a.oregon-postgres.render.com:3306/ncodegestion?useSSL=fal
 ## Variables de Entorno Disponibles
 
 - `PORT`: Puerto donde corre la aplicación (por defecto: 8080)
-- `SERVER_CONTEXT_PATH`: Ruta del contexto (por defecto: /NCod3)
+- `SERVER_CONTEXT_PATH`: Ruta del contexto (por defecto: /)
 - `DATABASE_URL`: URL completa de conexión a MySQL
 - `DATABASE_USERNAME`: Usuario de la base de datos
 - `DATABASE_PASSWORD`: Contraseña de la base de datos
@@ -95,9 +95,9 @@ jdbc:mysql://dpg-xxxxx-a.oregon-postgres.render.com:3306/ncodegestion?useSSL=fal
 ## Verificación
 
 Una vez desplegado, accede a:
-- `https://tu-app.onrender.com/NCod3/` - Página principal
-- `https://tu-app.onrender.com/NCod3/login` - Login
-- `https://tu-app.onrender.com/NCod3/planes` - Planes
+- `https://tu-app.onrender.com/` - Página principal
+- `https://tu-app.onrender.com/login` - Login
+- `https://tu-app.onrender.com/planes` - Planes
 
 ## Troubleshooting
 
