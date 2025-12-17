@@ -40,5 +40,11 @@ public interface CodigoVerificacionRepository extends JpaRepository<CodigoVerifi
     @Transactional
     @Query(value = "UPDATE codigoverificacion SET estado = CAST(:estado AS codigoverificacion_estado), usadoen = :usadoEn WHERE codigoid = :codigoId", nativeQuery = true)
     void marcarComoUsado(@Param("codigoId") Long codigoId, @Param("estado") String estado, @Param("usadoEn") LocalDateTime usadoEn);
+    
+    @Query(value = "SELECT cv.* FROM codigoverificacion cv " +
+                   "WHERE cv.codigo = :codigo AND cv.tipo::text = 'DEMO' " +
+                   "ORDER BY cv.fechacreacion DESC LIMIT 1", 
+           nativeQuery = true)
+    Optional<CodigoVerificacion> findByCodigoAndTipoDemo(@Param("codigo") String codigo);
 }
 

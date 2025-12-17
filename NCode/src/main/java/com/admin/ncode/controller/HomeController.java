@@ -61,10 +61,15 @@ public class HomeController {
     }
 
     @GetMapping("/contacto")
-    public String contacto(Model model) {
-        model.addAttribute("isAuthenticated", false);
+    public String contacto(Model model, HttpSession session) {
+        Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
+        model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
         if (!model.containsAttribute("contactoRequest")) {
             model.addAttribute("contactoRequest", new ContactoRequest());
+        }
+        // Agregar demoRequest para el modal de demo
+        if (!model.containsAttribute("demoRequest")) {
+            model.addAttribute("demoRequest", new DemoRequest());
         }
         return "contacto";
     }
@@ -230,8 +235,9 @@ public class HomeController {
     }
 
     @GetMapping("/planes")
-    public String planes(Model model) {
-        model.addAttribute("isAuthenticated", false);
+    public String planes(Model model, HttpSession session) {
+        Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
+        model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
         try {
             var planes = planLicenciaService.findAllPlanes();
             Map<Integer, List<com.admin.ncode.entity.PlanLicenciaDetalle>> detallesPorPlan = planLicenciaService.getDetallesPorPlan();
@@ -242,6 +248,11 @@ public class HomeController {
         } catch (Exception e) {
             model.addAttribute("planes", List.of());
             model.addAttribute("detallesPorPlan", Map.of());
+        }
+        
+        // Agregar demoRequest para el modal de demo
+        if (!model.containsAttribute("demoRequest")) {
+            model.addAttribute("demoRequest", new DemoRequest());
         }
         
         return "planes";

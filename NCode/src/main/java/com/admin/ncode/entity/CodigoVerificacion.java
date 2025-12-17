@@ -14,7 +14,7 @@ public class CodigoVerificacion {
     @Column(name = "codigoid", nullable = false)
     private Long codigoId;
     
-    @Column(name = "usuarioid", nullable = false)
+    @Column(name = "usuarioid", nullable = true)
     private Long usuarioId;
     
     @Column(name = "empresaid", nullable = false)

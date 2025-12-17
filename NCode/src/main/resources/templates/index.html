@@ -143,6 +143,74 @@
                 width: 95%;
             }
         }
+        
+        /* Demo Floating Button */
+        .demo-float {
+            position: fixed !important;
+            width: 70px;
+            height: 70px;
+            bottom: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, #00BFFF 0%, #0088CC 100%) !important;
+            color: #fff !important;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 191, 255, 0.4);
+            z-index: 10000 !important;
+            transition: all 0.3s ease;
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .demo-float:hover {
+            background: linear-gradient(135deg, #0088CC 0%, #006699 100%) !important;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 191, 255, 0.6);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .demo-float-text {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 3px;
+            line-height: 1;
+            color: #fff !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .demo-float svg {
+            width: 26px;
+            height: 26px;
+            stroke: #fff;
+            stroke-width: 2.5;
+            fill: none;
+        }
+        
+        @media (max-width: 480px) {
+            .demo-float {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                left: 20px;
+                font-size: 12px;
+            }
+            
+            .demo-float-text {
+                font-size: 10px;
+            }
+            
+            .demo-float svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -270,7 +338,6 @@
                     </div>
                 </div>
 
-                <a href="#demo" class="cta-button" onclick="event.preventDefault(); abrirModalDemo();" th:if="${isAuthenticated == null || !isAuthenticated}">Prueba el demo NCOD3</a>
             </div>
         </div>
     </section>
@@ -372,6 +439,18 @@
             </div>
         </div>
     </footer>
+
+    <!-- Demo Floating Button -->
+    <a href="#demo" 
+       onclick="event.preventDefault(); abrirModalDemo();" 
+       class="demo-float" 
+       title="Prueba el demo NCOD3"
+       style="display: flex !important;">
+        <span class="demo-float-text">Demo</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+    </a>
 
     <!-- WhatsApp Floating Button -->
     <a href="https://wa.me/1234567890" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">

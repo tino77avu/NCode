@@ -3,8 +3,10 @@ package com.admin.ncode.controller;
 import com.admin.ncode.dto.DemoRequest;
 import com.admin.ncode.entity.CodigoVerificacion;
 import com.admin.ncode.entity.Empresa;
+import com.admin.ncode.entity.SolicitudDemo;
 import com.admin.ncode.repository.CodigoVerificacionRepository;
 import com.admin.ncode.repository.EmpresaRepository;
+import com.admin.ncode.repository.SolicitudDemoRepository;
 import com.admin.ncode.service.EmailService;
 import com.admin.ncode.util.CodigoGenerador;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/demo")
@@ -39,6 +42,9 @@ public class DemoController {
 
     @Autowired
     private EmpresaRepository empresaRepository;
+    
+    @Autowired
+    private SolicitudDemoRepository solicitudDemoRepository;
 
     @PostMapping("/solicitar")
     public String solicitarDemo(@Valid @ModelAttribute("demoRequest") DemoRequest demoRequest,
@@ -63,8 +69,8 @@ public class DemoController {
             // Generar código de verificación
             String codigo = CodigoGenerador.generarCodigo();
             
-            // Obtener empresaId (usar la primera empresa activa o crear una por defecto)
-            Long empresaId = obtenerEmpresaId();
+            // Buscar o crear empresa por RUC
+            Long empresaId = obtenerOcrearEmpresa(demoRequest);
             
             // Obtener IP del cliente
             String ipCliente = obtenerIpCliente(request);
@@ -82,6 +88,30 @@ public class DemoController {
                 fechaExpiracion,
                 ipCliente
             );
+            
+            // Buscar el código recién insertado para obtener su ID
+            Long codigoId = null;
+            try {
+                Optional<CodigoVerificacion> codigoOpt = codigoVerificacionRepository.findByCodigoAndTipoDemo(codigo);
+                if (codigoOpt.isPresent()) {
+                    codigoId = codigoOpt.get().getCodigoId();
+                }
+            } catch (Exception e) {
+                logger.warn("No se pudo obtener el ID del código de verificación: {}", e.getMessage());
+            }
+            
+            // Guardar solicitud de demo en la tabla dedicada
+            SolicitudDemo solicitudDemo = new SolicitudDemo();
+            solicitudDemo.setNombre(demoRequest.getNombre());
+            solicitudDemo.setCorreo(demoRequest.getCorreo());
+            solicitudDemo.setEmpresa(demoRequest.getEmpresa());
+            solicitudDemo.setRuc(demoRequest.getRuc());
+            solicitudDemo.setDireccion(demoRequest.getDireccion());
+            solicitudDemo.setCodigoId(codigoId);
+            solicitudDemo.setCodigoVerificacion(codigo);
+            solicitudDemo.setEstado("PENDIENTE");
+            solicitudDemo.setIpCliente(ipCliente);
+            solicitudDemoRepository.save(solicitudDemo);
             
             // Enviar email con el código
             emailService.enviarCodigoDemo(demoRequest.getCorreo(), codigo, demoRequest.getNombre());
@@ -123,15 +153,53 @@ public class DemoController {
         return ip != null ? ip : "unknown";
     }
 
-    private Long obtenerEmpresaId() {
-        // Intentar obtener la primera empresa activa
-        List<Empresa> empresas = empresaRepository.findAllByOrderByEmpresaIdAsc();
-        if (!empresas.isEmpty()) {
-            return empresas.get(0).getEmpresaId();
+    private Long obtenerOcrearEmpresa(DemoRequest demoRequest) {
+        // Buscar empresa por RUC
+        Optional<Empresa> empresaOpt = empresaRepository.findByRuc(demoRequest.getRuc());
+        
+        if (empresaOpt.isPresent()) {
+            // Si la empresa ya existe, retornar su ID
+            logger.info("Empresa encontrada por RUC: {} - ID: {}", demoRequest.getRuc(), empresaOpt.get().getEmpresaId());
+            return empresaOpt.get().getEmpresaId();
+        } else {
+            try {
+                // Si no existe, crear una nueva empresa usando consulta nativa con CAST
+                empresaRepository.insertEmpresa(
+                    demoRequest.getRuc(),
+                    demoRequest.getEmpresa(),
+                    demoRequest.getEmpresa(),
+                    "Peru",
+                    "ACTIVA"
+                );
+                
+                // Buscar la empresa recién creada para obtener su ID
+                Optional<Empresa> empresaCreada = empresaRepository.findByRuc(demoRequest.getRuc());
+                if (empresaCreada.isPresent()) {
+                    Long empresaId = empresaCreada.get().getEmpresaId();
+                    logger.info("Nueva empresa creada. RUC: {} - ID: {}", demoRequest.getRuc(), empresaId);
+                    return empresaId;
+                } else {
+                    // Si no se encontró después de insertar, podría ser un problema de sincronización
+                    // Intentar buscar nuevamente después de un breve delay
+                    logger.warn("No se encontró la empresa inmediatamente después de insertar. Reintentando búsqueda...");
+                    empresaCreada = empresaRepository.findByRuc(demoRequest.getRuc());
+                    if (empresaCreada.isPresent()) {
+                        return empresaCreada.get().getEmpresaId();
+                    }
+                    throw new RuntimeException("Error al crear la empresa: no se pudo encontrar después de insertar");
+                }
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                // Si hay un error de integridad (por ejemplo, RUC duplicado o ID duplicado),
+                // intentar buscar la empresa nuevamente
+                logger.warn("Error de integridad al insertar empresa. Reintentando búsqueda por RUC: {}", demoRequest.getRuc());
+                Optional<Empresa> empresaExistente = empresaRepository.findByRuc(demoRequest.getRuc());
+                if (empresaExistente.isPresent()) {
+                    logger.info("Empresa encontrada después del error. RUC: {} - ID: {}", demoRequest.getRuc(), empresaExistente.get().getEmpresaId());
+                    return empresaExistente.get().getEmpresaId();
+                }
+                throw new RuntimeException("Error al crear la empresa: " + e.getMessage(), e);
+            }
         }
-        // Si no hay empresas, retornar 1 como valor por defecto
-        // (asumiendo que existe una empresa con ID 1, o se creará una)
-        return 1L;
     }
 }
 
