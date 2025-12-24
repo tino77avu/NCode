@@ -213,6 +213,15 @@
             }
         }
         
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
         .demo-modal-header {
             display: flex;
             justify-content: space-between;
@@ -393,6 +402,7 @@
                         <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Roles</a>
                         <a th:href="@{/gestion/empresas}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Empresas</a>
                         <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
+                        <a th:href="@{/gestion/demos}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Demos</a>
                     </div>
                 </div>
                 <a th:href="@{/login}" class="nav-link nav-link-login" th:if="${isAuthenticated == null || !isAuthenticated}">Login</a>
@@ -454,9 +464,41 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p class="footer-tagline">Escribe en tu idioma, NCOD3 lo traduce a SQL</p>
+        <div class="footer-content">
+            <!-- Sección Superior: Redes Sociales -->
+            <div class="footer-section footer-top">
+                <span class="footer-top-text">Síguenos en:</span>
+                <div class="footer-social">
+                    <a href="https://www.facebook.com/ncod3" target="_blank" class="social-icon" title="Facebook">
+                        f
+                    </a>
+                    <a href="https://www.instagram.com/ncod3" target="_blank" class="social-icon instagram" title="Instagram">
+                        📷
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sección Media: Título -->
+            <div class="footer-section footer-middle">
+                <h3>AYUDA Y LEGALES</h3>
+            </div>
+
+            <!-- Sección Inferior: Enlaces y Libro de Reclamaciones -->
+            <div class="footer-section footer-bottom">
+                <div class="footer-links">
+                    <a th:href="@{/legal/politica-privacidad}">Política de Privacidad</a>
+                    <a th:href="@{/legal/politicas-cookies}">Políticas de cookies</a>
+                    <a th:href="@{/legal/terminos-condiciones}">Términos y condiciones de uso</a>
+                </div>
+                <a th:href="@{/legal/libro-reclamaciones}" class="footer-reclamaciones">
+                    <div class="footer-reclamaciones-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6H20V18H4V6ZM2 4V20H22V4H2Z" fill="#00BFFF"/>
+                            <path d="M6 8H18V10H6V8ZM6 12H18V14H6V12ZM6 16H14V18H6V16Z" fill="#00BFFF"/>
+                        </svg>
+                    </div>
+                    <span class="footer-reclamaciones-text">Libro de Reclamaciones</span>
+                </a>
             </div>
         </div>
     </footer>
@@ -488,6 +530,7 @@
                  th:text="${mensajeError}"></div>
             
             <form th:action="@{/demo/solicitar}" th:object="${demoRequest}" method="post" id="demoForm">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div th:if="${#fields.hasErrors('*')}" class="demo-error-message" style="background-color: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
                     <p style="margin: 0; font-weight: 600;">Por favor, corrige los errores:</p>
                     <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
@@ -545,14 +588,30 @@
                           class="demo-error-message"></span>
                 </div>
                 
-                <button type="submit" class="cta-button" style="width: 100%; margin-top: 1rem;">Solicitar Demo</button>
+                <div class="demo-form-group">
+                    <label for="telefono" class="demo-form-label">Teléfono *</label>
+                    <input type="tel" id="telefono" th:field="*{telefono}" class="demo-form-input" 
+                           th:classappend="${#fields.hasErrors('telefono')} ? 'error'" 
+                           placeholder="Teléfono de contacto" required>
+                    <span th:if="${#fields.hasErrors('telefono')}" 
+                          th:errors="*{telefono}" 
+                          class="demo-error-message"></span>
+                </div>
+                
+                <div id="demo-processing" style="display: none; text-align: center; padding: 1rem; margin-top: 1rem; background-color: rgba(0, 191, 255, 0.1); border: 1px solid var(--primary-green); border-radius: 8px;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                        <div class="demo-spinner" style="width: 20px; height: 20px; border: 3px solid rgba(0, 191, 255, 0.3); border-top-color: var(--primary-green); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <span style="color: var(--primary-green); font-weight: 600;">Procesando tu solicitud...</span>
+                    </div>
+                </div>
+                
+                <button type="submit" id="demo-submit-btn" class="cta-button" style="width: 100%; margin-top: 1rem;">Solicitar Demo</button>
             </form>
         </div>
     </div>
 
     <!-- Demo Floating Button -->
-    <a href="#demo" 
-       onclick="event.preventDefault(); abrirModalDemo();" 
+    <a th:href="@{/demo}" 
        class="demo-float" 
        title="Prueba el demo NCOD3"
        style="display: flex !important;">
@@ -578,7 +637,46 @@
         function cerrarModalDemo() {
             document.getElementById('demoModal').style.display = 'none';
             document.body.style.overflow = 'auto';
+            // Eliminar el hash #demo de la URL sin recargar la página
+            if (window.location.hash === '#demo') {
+                history.replaceState(null, null, window.location.pathname + window.location.search);
+            }
         }
+        
+        // Manejar el envío del formulario de demo - mostrar mensaje de procesamiento
+        document.addEventListener('DOMContentLoaded', function() {
+            const demoForm = document.getElementById('demoForm');
+            const demoSubmitBtn = document.getElementById('demo-submit-btn');
+            const demoProcessing = document.getElementById('demo-processing');
+            
+            if (demoForm && demoSubmitBtn && demoProcessing) {
+                demoForm.addEventListener('submit', function(e) {
+                    // Validar que todos los campos requeridos estén llenos antes de mostrar el mensaje
+                    const requiredFields = demoForm.querySelectorAll('[required]');
+                    let isValid = true;
+                    
+                    requiredFields.forEach(function(field) {
+                        if (!field.value || field.value.trim() === '') {
+                            isValid = false;
+                        }
+                    });
+                    
+                    if (isValid) {
+                        // Mostrar mensaje de procesamiento
+                        demoProcessing.style.display = 'block';
+                        
+                        // Ocultar el botón mientras se procesa
+                        demoSubmitBtn.style.display = 'none';
+                        
+                        // Deshabilitar todos los campos del formulario
+                        const formInputs = demoForm.querySelectorAll('input');
+                        formInputs.forEach(function(input) {
+                            input.disabled = true;
+                        });
+                    }
+                });
+            }
+        });
         
         // Ocultar mensaje de éxito después de 1 segundo (si el usuario está autenticado)
         window.addEventListener('DOMContentLoaded', function() {

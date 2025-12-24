@@ -3,17 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NCodeGestion - Tu asistente inteligente de bases de datos</title>
+    <title>Políticas de Cookies - NCOD3</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        #gestion-menu:hover + #gestion-dropdown,
-        #gestion-dropdown:hover {
-            display: block !important;
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
         }
-        
+        .legal-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .legal-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+        .legal-content {
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+        .legal-content h2 {
+            color: var(--primary-green);
+            font-size: 1.8rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .legal-content h3 {
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .legal-content p {
+            margin-bottom: 1.2rem;
+            text-align: justify;
+        }
+        .legal-content ul, .legal-content ol {
+            margin: 1.2rem 0;
+            padding-left: 2rem;
+        }
+        .legal-content li {
+            margin-bottom: 0.8rem;
+        }
+        .legal-content strong {
+            color: var(--primary-green);
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-green);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .back-link:hover {
+            background: #0088CC;
+            transform: translateY(-2px);
+        }
         
         /* Demo Floating Button */
         .demo-float {
@@ -94,122 +151,104 @@
                 </a>
             </div>
             <div style="justify-self: center;">
-                <img th:src="@{/images/Logo.JPG}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+                <img th:src="@{/images/Logo.JPG}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain;">
             </div>
             <div class="nav-menu" style="justify-self: end;">
                 <a th:href="@{/planes}" class="nav-link" th:if="${isAuthenticated == null || !isAuthenticated}">Planes</a>
                 <a th:href="@{/contacto}" class="nav-link" th:if="${isAuthenticated == null || !isAuthenticated}">Contacto</a>
                 <div style="position: relative; display: inline-block;" th:if="${isAuthenticated != null && isAuthenticated}" onmouseenter="document.getElementById('gestion-dropdown').style.display='block'" onmouseleave="document.getElementById('gestion-dropdown').style.display='none'">
                     <a href="#" class="nav-link" id="gestion-menu">Gestión</a>
-                    <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background-color: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; margin-top: 0.5rem; min-width: 150px; z-index: 1000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
-                        <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Roles</a>
-                        <a th:href="@{/gestion/empresas}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Empresas</a>
-                        <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
+                    <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; min-width: 200px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); z-index: 1000; margin-top: 0.5rem;">
+                        <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-color);">Usuarios</a>
+                        <a th:href="@{/gestion/empresas}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-color);">Empresas</a>
+                        <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-color);">Roles</a>
                         <a th:href="@{/gestion/demos}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Demos</a>
                     </div>
                 </div>
-                <a th:href="@{/login}" class="nav-link nav-link-login" th:if="${isAuthenticated == null || !isAuthenticated}">Login</a>
+                <a th:href="@{/login}" class="nav-link" th:if="${isAuthenticated == null || !isAuthenticated}">Login</a>
                 <form th:action="@{/logout}" method="post" style="display: inline;" th:if="${isAuthenticated != null && isAuthenticated}">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                    <button type="submit" class="nav-link nav-link-login" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit; font: inherit; text-decoration: none;">Cerrar Sesión</button>
+                    <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit;">Cerrar Sesión</button>
                 </form>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">NCOD3: Tu asistente inteligente de bases de datos</h1>
-                <p class="hero-subtitle">Convierte tus consultas en lenguaje natural a SQL automáticamente, con control total y seguridad.</p>
-                
-                <div class="benefits-grid">
-                    <div class="benefit-item">
-                        <div class="benefit-icon">🔄</div>
-                        <p>Traducción automática de lenguaje natural a SQL</p>
-                    </div>
-                    <div class="benefit-item">
-                        <div class="benefit-icon">📊</div>
-                        <p>Registro de todas las consultas y errores</p>
-                    </div>
-                    <div class="benefit-item">
-                        <div class="benefit-icon">👥</div>
-                        <p>Gestión de usuarios, niveles de acceso y licencias</p>
-                    </div>
-                    <div class="benefit-item">
-                        <div class="benefit-icon">🔒</div>
-                        <p>Seguridad y trazabilidad de tus datos</p>
-                    </div>
-                </div>
+    <!-- Contenido Principal -->
+    <section class="section" style="min-height: 80vh; padding: 2rem 0;">
+        <div class="legal-container">
+            <div class="legal-header">
+                <h1>Políticas de Cookies</h1>
+                <p>Última actualización: Diciembre 2025</p>
             </div>
-        </div>
-    </section>
 
-    <!-- Sección de Reportes -->
-    <section class="section reports-section">
-        <div class="container">
-            <div class="section-content">
-                <h2 class="section-title">Genera reportes al instante, sin escribir SQL</h2>
-                <p class="section-subtitle">¿Creación de reportes lenta y costosa? ¿Dependes de desarrolladores SQL?</p>
-                <p class="section-description">Con NCOD3, cualquier usuario puede dictar el reporte en lenguaje natural y obtener resultados inmediatos, sin necesidad de escribir scripts complejos.</p>
+            <div class="legal-content">
+                <h2>1. ¿Qué son las Cookies?</h2>
+                <p>Las cookies son pequeños archivos de texto que se almacenan en su dispositivo cuando visita nuestro sitio web. Estas cookies nos permiten reconocer su navegador y capturar y recordar cierta información sobre sus preferencias o acciones pasadas.</p>
+
+                <h2>2. Tipos de Cookies que Utilizamos</h2>
                 
-                <div class="benefits-list">
-                    <div class="benefit-card">
-                        <div class="benefit-card-icon">⏱️</div>
-                        <h3>Reduce tiempo y costos</h3>
-                        <p>Reduce tiempo y costos en desarrollo de reportes</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-card-icon">👤</div>
-                        <h3>Accesible para todos</h3>
-                        <p>Cualquier usuario puede crear consultas y reportes fácilmente</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-card-icon">⚡</div>
-                        <h3>Flujo eficiente</h3>
-                        <p>Flujo de trabajo más rápido, simple y eficiente</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-card-icon">🛡️</div>
-                        <h3>Seguridad garantizada</h3>
-                        <p>Mantiene trazabilidad y seguridad de los datos</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+                <h3>2.1. Cookies Esenciales</h3>
+                <p>Estas cookies son necesarias para el funcionamiento del sitio web y no pueden desactivarse. Incluyen:</p>
+                <ul>
+                    <li><strong>Cookies de sesión:</strong> Mantienen su sesión activa mientras navega por el sitio.</li>
+                    <li><strong>Cookies de seguridad:</strong> Protegen contra accesos no autorizados y fraudes.</li>
+                    <li><strong>Cookies de autenticación:</strong> Identifican usuarios autenticados.</li>
+                </ul>
 
-    <!-- Sección Principal de Valor -->
-    <section class="section main-value-section">
-        <div class="container">
-            <div class="section-content">
-                <h2 class="section-title">Escribe en tu idioma, NCOD3 lo traduce a SQL</h2>
-                <p class="section-subtitle">Convierte tus palabras en consultas ejecutables de manera rápida, simple y segura, directamente en tu infraestructura local.</p>
-                
-                <div class="benefits-list">
-                    <div class="benefit-card">
-                        <div class="benefit-card-icon">🤖</div>
-                        <h3>Traducción automática</h3>
-                        <p>Traduce texto a SQL automáticamente</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-card-icon">🏢</div>
-                        <h3>On-Premise</h3>
-                        <p>Controla accesos y protege tus datos dentro de tu entorno On-Premise</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-card-icon">💻</div>
-                        <h3>Independencia</h3>
-                        <p>Ejecuta consultas sin depender de desarrolladores SQL</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-card-icon">✅</div>
-                        <h3>Eficiencia</h3>
-                        <p>Reduce tiempo y errores en tus operaciones</p>
-                    </div>
-                </div>
+                <h3>2.2. Cookies de Funcionalidad</h3>
+                <p>Estas cookies permiten que el sitio web recuerde sus preferencias y proporcione características mejoradas:</p>
+                <ul>
+                    <li>Preferencias de idioma.</li>
+                    <li>Configuraciones de accesibilidad.</li>
+                    <li>Información de formularios guardados.</li>
+                </ul>
 
+                <h3>2.3. Cookies Analíticas</h3>
+                <p>Nos ayudan a entender cómo los visitantes interactúan con nuestro sitio web:</p>
+                <ul>
+                    <li>Páginas más visitadas.</li>
+                    <li>Tiempo de permanencia en el sitio.</li>
+                    <li>Patrones de navegación.</li>
+                </ul>
+
+                <h2>3. Finalidad del Uso de Cookies</h2>
+                <p>Utilizamos cookies para:</p>
+                <ul>
+                    <li>Garantizar el correcto funcionamiento del sitio web.</li>
+                    <li>Mejorar la experiencia del usuario.</li>
+                    <li>Analizar el tráfico y comportamiento de los usuarios.</li>
+                    <li>Personalizar el contenido y publicidad.</li>
+                    <li>Mantener la seguridad de la sesión.</li>
+                </ul>
+
+                <h2>4. Gestión de Cookies</h2>
+                <p>Puede controlar y gestionar las cookies de varias maneras:</p>
+                <ul>
+                    <li><strong>Configuración del navegador:</strong> La mayoría de los navegadores le permiten ver, eliminar y bloquear cookies desde la configuración de privacidad.</li>
+                    <li><strong>Herramientas de terceros:</strong> Puede utilizar herramientas de gestión de cookies para controlar qué cookies acepta.</li>
+                </ul>
+                <p><strong>Nota importante:</strong> Si desactiva las cookies esenciales, es posible que algunas funcionalidades del sitio web no funcionen correctamente.</p>
+
+                <h2>5. Cookies de Terceros</h2>
+                <p>Algunos servicios de terceros pueden establecer cookies en su dispositivo. Estos incluyen:</p>
+                <ul>
+                    <li>Servicios de análisis web (Google Analytics, etc.).</li>
+                    <li>Redes sociales (Facebook, Instagram, etc.).</li>
+                    <li>Servicios de mapas y ubicación.</li>
+                </ul>
+                <p>No tenemos control sobre estas cookies de terceros. Le recomendamos revisar las políticas de privacidad de estos servicios.</p>
+
+                <h2>6. Actualización de esta Política</h2>
+                <p>Podemos actualizar esta Política de Cookies periódicamente. Le notificaremos sobre cambios significativos mediante un aviso en nuestro sitio web.</p>
+
+                <h2>7. Contacto</h2>
+                <p>Si tiene preguntas sobre nuestra Política de Cookies, puede contactarnos en:</p>
+                <ul>
+                    <li><strong>Email:</strong> soporte@ncod3.com</li>
+                </ul>
+
+                <a th:href="@{/}" class="back-link">← Volver al inicio</a>
             </div>
         </div>
     </section>
@@ -272,21 +311,7 @@
             <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 339.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56 81.2 56 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
         </svg>
     </a>
-    
-    <script>
-        // Ocultar mensaje de éxito después de 1 segundo (si el usuario está autenticado)
-        window.addEventListener('DOMContentLoaded', function() {
-            const mensajeExitoFlotante = document.getElementById('mensajeExitoFlotante');
-            if (mensajeExitoFlotante) {
-                setTimeout(function() {
-                    mensajeExitoFlotante.style.opacity = '0';
-                    setTimeout(function() {
-                        mensajeExitoFlotante.remove();
-                    }, 300); // Esperar a que termine la animación de fade out
-                }, 1000); // Ocultar después de 1 segundo
-            }
-        });
-    </script>
 </body>
 </html>
+
 

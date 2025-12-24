@@ -327,9 +327,41 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p class="footer-tagline">Escribe en tu idioma, NCOD3 lo traduce a SQL</p>
+        <div class="footer-content">
+            <!-- Sección Superior: Redes Sociales -->
+            <div class="footer-section footer-top">
+                <span class="footer-top-text">Síguenos en:</span>
+                <div class="footer-social">
+                    <a href="https://www.facebook.com/ncod3" target="_blank" class="social-icon" title="Facebook">
+                        f
+                    </a>
+                    <a href="https://www.instagram.com/ncod3" target="_blank" class="social-icon instagram" title="Instagram">
+                        📷
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sección Media: Título -->
+            <div class="footer-section footer-middle">
+                <h3>AYUDA Y LEGALES</h3>
+            </div>
+
+            <!-- Sección Inferior: Enlaces y Libro de Reclamaciones -->
+            <div class="footer-section footer-bottom">
+                <div class="footer-links">
+                    <a th:href="@{/legal/politica-privacidad}">Política de Privacidad</a>
+                    <a th:href="@{/legal/politicas-cookies}">Políticas de cookies</a>
+                    <a th:href="@{/legal/terminos-condiciones}">Términos y condiciones de uso</a>
+                </div>
+                <a th:href="@{/legal/libro-reclamaciones}" class="footer-reclamaciones">
+                    <div class="footer-reclamaciones-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6H20V18H4V6ZM2 4V20H22V4H2Z" fill="#00BFFF"/>
+                            <path d="M6 8H18V10H6V8ZM6 12H18V14H6V12ZM6 16H14V18H6V16Z" fill="#00BFFF"/>
+                        </svg>
+                    </div>
+                    <span class="footer-reclamaciones-text">Libro de Reclamaciones</span>
+                </a>
             </div>
         </div>
     </footer>

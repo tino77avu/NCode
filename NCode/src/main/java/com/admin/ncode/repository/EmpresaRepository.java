@@ -23,13 +23,15 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
     
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO empresa (ruc, razonsocial, nombrecomercial, pais, estado) " +
-                   "VALUES (:ruc, :razonsocial, :nombrecomercial, :pais, CAST(:estado AS empresa_estado))", 
+    @Query(value = "INSERT INTO empresa (ruc, razonsocial, nombrecomercial, pais, direccion, telefono, estado) " +
+                   "VALUES (:ruc, :razonsocial, :nombrecomercial, :pais, :direccion, :telefono, CAST(:estado AS empresa_estado))", 
            nativeQuery = true)
     void insertEmpresa(@Param("ruc") String ruc,
                        @Param("razonsocial") String razonSocial,
                        @Param("nombrecomercial") String nombreComercial,
                        @Param("pais") String pais,
+                       @Param("direccion") String direccion,
+                       @Param("telefono") String telefono,
                        @Param("estado") String estado);
 }
 

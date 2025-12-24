@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones de Uso - NCOD3</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        .legal-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .legal-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+        .legal-content {
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+        .legal-content h2 {
+            color: var(--primary-green);
+            font-size: 1.8rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .legal-content h3 {
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .legal-content p {
+            margin-bottom: 1.2rem;
+            text-align: justify;
+        }
+        .legal-content ul, .legal-content ol {
+            margin: 1.2rem 0;
+            padding-left: 2rem;
+        }
+        .legal-content li {
+            margin-bottom: 0.8rem;
+        }
+        .legal-content strong {
+            color: var(--primary-green);
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-green);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .back-link:hover {
+            background: #0088CC;
+            transform: translateY(-2px);
+        }
+        
+        /* Demo Floating Button */
+        .demo-float {
+            position: fixed !important;
+            width: 70px;
+            height: 70px;
+            bottom: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, #00BFFF 0%, #0088CC 100%) !important;
+            color: #fff !important;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 191, 255, 0.4);
+            z-index: 10000 !important;
+            transition: all 0.3s ease;
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .demo-float:hover {
+            background: linear-gradient(135deg, #0088CC 0%, #006699 100%) !important;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 191, 255, 0.6);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .demo-float-text {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 3px;
+            line-height: 1;
+            color: #fff !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .demo-float svg {
+            width: 26px;
+            height: 26px;
+            stroke: #fff;
+            stroke-width: 2.5;
+            fill: none;
+        }
+        
+        @media (max-width: 480px) {
+            .demo-float {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                left: 20px;
+                font-size: 12px;
+            }
+            
+            .demo-float-text {
+                font-size: 10px;
+            }
+            
+            .demo-float svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación Superior -->
+    <nav class="navbar">
+        <div class="nav-container" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%;">
+            <div class="logo-container" style="justify-self: start;">
+                <a th:href="@{/}" style="text-decoration: none;">
+                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
+                </a>
+            </div>
+            <div style="justify-self: center;">
+                <img th:src="@{/images/Logo.JPG}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain;">
+            </div>
+            <div class="nav-menu" style="justify-self: end;">
+                <a th:href="@{/planes}" class="nav-link" th:if="${isAuthenticated == null || !isAuthenticated}">Planes</a>
+                <a th:href="@{/contacto}" class="nav-link" th:if="${isAuthenticated == null || !isAuthenticated}">Contacto</a>
+                <div style="position: relative; display: inline-block;" th:if="${isAuthenticated != null && isAuthenticated}" onmouseenter="document.getElementById('gestion-dropdown').style.display='block'" onmouseleave="document.getElementById('gestion-dropdown').style.display='none'">
+                    <a href="#" class="nav-link" id="gestion-menu">Gestión</a>
+                    <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; min-width: 200px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); z-index: 1000; margin-top: 0.5rem;">
+                        <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-color);">Usuarios</a>
+                        <a th:href="@{/gestion/empresas}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-color);">Empresas</a>
+                        <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-color);">Roles</a>
+                        <a th:href="@{/gestion/demos}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Demos</a>
+                    </div>
+                </div>
+                <a th:href="@{/login}" class="nav-link" th:if="${isAuthenticated == null || !isAuthenticated}">Login</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;" th:if="${isAuthenticated != null && isAuthenticated}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit;">Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <section class="section" style="min-height: 80vh; padding: 2rem 0;">
+        <div class="legal-container">
+            <div class="legal-header">
+                <h1>Términos y Condiciones de Uso</h1>
+                <p>Última actualización: Diciembre 2025</p>
+            </div>
+
+            <div class="legal-content">
+                <h2>1. Aceptación de los Términos</h2>
+                <p>Al acceder y utilizar los servicios de NCOD3, usted acepta estar sujeto a estos Términos y Condiciones de Uso. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.</p>
+
+                <h2>2. Descripción del Servicio</h2>
+                <p>NCOD3 es una plataforma que permite a los usuarios convertir consultas en lenguaje natural a código SQL, facilitando el acceso y manipulación de bases de datos sin necesidad de conocimientos técnicos avanzados en SQL.</p>
+
+                <h2>3. Registro y Cuenta de Usuario</h2>
+                <h3>3.1. Requisitos de Registro</h3>
+                <p>Para utilizar nuestros servicios, debe:</p>
+                <ul>
+                    <li>Ser mayor de edad o tener el consentimiento de un tutor legal.</li>
+                    <li>Proporcionar información veraz, precisa y completa.</li>
+                    <li>Mantener la confidencialidad de sus credenciales de acceso.</li>
+                    <li>Notificar inmediatamente cualquier uso no autorizado de su cuenta.</li>
+                </ul>
+
+                <h3>3.2. Responsabilidad de la Cuenta</h3>
+                <p>Usted es responsable de todas las actividades que ocurran bajo su cuenta. NCOD3 no será responsable de ningún daño derivado del uso no autorizado de su cuenta.</p>
+
+                <h2>4. Uso Aceptable</h2>
+                <p>Usted se compromete a utilizar nuestros servicios únicamente para fines legales y de acuerdo con estos términos. Está prohibido:</p>
+                <ul>
+                    <li>Utilizar el servicio para actividades ilegales o no autorizadas.</li>
+                    <li>Intentar acceder a sistemas o datos no autorizados.</li>
+                    <li>Interferir con el funcionamiento del servicio.</li>
+                    <li>Realizar ingeniería inversa, descompilar o desensamblar el software.</li>
+                    <li>Transmitir virus, malware o código malicioso.</li>
+                    <li>Realizar actividades que puedan dañar, sobrecargar o comprometer nuestros servidores.</li>
+                </ul>
+
+                <h2>5. Propiedad Intelectual</h2>
+                <p>Todos los derechos de propiedad intelectual sobre el servicio, incluyendo pero no limitado a software, diseño, logotipos, marcas y contenido, son propiedad de NCOD3 o de sus licenciantes. Usted no adquiere ningún derecho de propiedad sobre el servicio mediante su uso.</p>
+
+                <h2>6. Datos del Usuario</h2>
+                <h3>6.1. Propiedad de los Datos</h3>
+                <p>Usted conserva todos los derechos sobre los datos que ingrese o procese a través de nuestros servicios. NCOD3 no reclama propiedad sobre sus datos.</p>
+
+                <h3>6.2. Almacenamiento y Seguridad</h3>
+                <p>Implementamos medidas de seguridad para proteger sus datos, pero no podemos garantizar seguridad absoluta. Usted es responsable de mantener copias de seguridad de sus datos importantes.</p>
+
+                <h2>7. Planes y Pagos</h2>
+                <h3>7.1. Planes de Servicio</h3>
+                <p>Ofrecemos diferentes planes de servicio con características y límites específicos. Los detalles de cada plan están disponibles en nuestra página de planes.</p>
+
+                <h3>7.2. Pagos</h3>
+                <p>Los pagos se procesan de acuerdo con los términos acordados en su plan. Todos los precios están expresados en la moneda indicada y pueden estar sujetos a impuestos aplicables.</p>
+
+                <h3>7.3. Renovación y Cancelación</h3>
+                <p>Los planes se renuevan automáticamente según el período acordado, a menos que se cancele antes de la fecha de renovación. Las cancelaciones deben realizarse con al menos 30 días de anticipación.</p>
+
+                <h2>8. Limitación de Responsabilidad</h2>
+                <p>NCOD3 se proporciona "tal cual" y "según disponibilidad". No garantizamos que el servicio esté libre de errores, interrupciones o defectos. En la medida máxima permitida por la ley, NCOD3 no será responsable de:</p>
+                <ul>
+                    <li>Daños indirectos, incidentales o consecuentes.</li>
+                    <li>Pérdida de datos, beneficios o oportunidades comerciales.</li>
+                    <li>Interrupciones del servicio o fallos técnicos.</li>
+                </ul>
+
+                <h2>9. Modificaciones del Servicio</h2>
+                <p>Nos reservamos el derecho de modificar, suspender o discontinuar cualquier aspecto del servicio en cualquier momento, con o sin previo aviso. No seremos responsables ante usted ni ante terceros por cualquier modificación, suspensión o discontinuación del servicio.</p>
+
+                <h2>10. Terminación</h2>
+                <p>Podemos terminar o suspender su acceso al servicio inmediatamente, sin previo aviso, por cualquier motivo, incluyendo pero no limitado a:</p>
+                <ul>
+                    <li>Violación de estos términos.</li>
+                    <li>Uso fraudulento o no autorizado del servicio.</li>
+                    <li>Incumplimiento de pagos.</li>
+                </ul>
+
+                <h2>11. Ley Aplicable y Jurisdicción</h2>
+                <p>Estos términos se rigen por las leyes de [País/Jurisdicción]. Cualquier disputa relacionada con estos términos será resuelta en los tribunales competentes de [Ciudad, País].</p>
+
+                <h2>12. Modificaciones de los Términos</h2>
+                <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Las modificaciones entrarán en vigor al publicarse en nuestro sitio web. Su uso continuado del servicio después de las modificaciones constituye su aceptación de los nuevos términos.</p>
+
+                <h2>13. Contacto</h2>
+                <p>Para consultas sobre estos términos, puede contactarnos en:</p>
+                <ul>
+                    <li><strong>Email:</strong> legal@ncod3.com</li>
+                    <li><strong>Teléfono:</strong> [Número de contacto]</li>
+                </ul>
+
+                <a th:href="@{/}" class="back-link">← Volver al inicio</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <!-- Sección Superior: Redes Sociales -->
+            <div class="footer-section footer-top">
+                <span class="footer-top-text">Síguenos en:</span>
+                <div class="footer-social">
+                    <a href="https://www.facebook.com/ncod3" target="_blank" class="social-icon" title="Facebook">
+                        f
+                    </a>
+                    <a href="https://www.instagram.com/ncod3" target="_blank" class="social-icon instagram" title="Instagram">
+                        📷
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sección Media: Título -->
+            <div class="footer-section footer-middle">
+                <h3>AYUDA Y LEGALES</h3>
+            </div>
+
+            <!-- Sección Inferior: Enlaces y Libro de Reclamaciones -->
+            <div class="footer-section footer-bottom">
+                <div class="footer-links">
+                    <a th:href="@{/legal/politica-privacidad}">Política de Privacidad</a>
+                    <a th:href="@{/legal/politicas-cookies}">Políticas de cookies</a>
+                    <a th:href="@{/legal/terminos-condiciones}">Términos y condiciones de uso</a>
+                </div>
+                <a th:href="@{/legal/libro-reclamaciones}" class="footer-reclamaciones">
+                    <div class="footer-reclamaciones-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6H20V18H4V6ZM2 4V20H22V4H2Z" fill="#00BFFF"/>
+                            <path d="M6 8H18V10H6V8ZM6 12H18V14H6V12ZM6 16H14V18H6V16Z" fill="#00BFFF"/>
+                        </svg>
+                    </div>
+                    <span class="footer-reclamaciones-text">Libro de Reclamaciones</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Demo Floating Button -->
+    <a th:href="@{/demo}" 
+       class="demo-float" 
+       title="Prueba el demo NCOD3"
+       style="display: flex !important;">
+        <span class="demo-float-text">Demo</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+    </a>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/1234567890" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 339.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56 81.2 56 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+        </svg>
+    </a>
+</body>
+</html>
+

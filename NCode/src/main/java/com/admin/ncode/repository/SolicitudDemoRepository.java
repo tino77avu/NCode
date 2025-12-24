@@ -22,5 +22,9 @@ public interface SolicitudDemoRepository extends JpaRepository<SolicitudDemo, Lo
     
     @Query("SELECT s FROM SolicitudDemo s WHERE s.codigoId = :codigoId")
     Optional<SolicitudDemo> findByCodigoId(@Param("codigoId") Long codigoId);
+    
+    // Buscar solicitudes activas (PENDIENTE o PROCESADO) por RUC
+    @Query("SELECT s FROM SolicitudDemo s WHERE s.ruc = :ruc AND s.estado IN ('PENDIENTE', 'PROCESADO') ORDER BY s.fechaSolicitud DESC")
+    List<SolicitudDemo> findActivasByRuc(@Param("ruc") String ruc);
 }
 

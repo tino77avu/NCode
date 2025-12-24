@@ -56,6 +56,10 @@ public class HomeController {
         if (!model.containsAttribute("demoRequest")) {
             model.addAttribute("demoRequest", new com.admin.ncode.dto.DemoRequest());
         }
+        // Verificar si hay un flag para abrir el modal (desde flash attributes)
+        if (model.containsAttribute("abrirModalDemo")) {
+            model.addAttribute("abrirModalDemo", true);
+        }
         // Los mensajes flash se agregan automáticamente por Spring si existen
         return "index";
     }

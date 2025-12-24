@@ -26,6 +26,12 @@ public class Empresa {
     @Column(name = "pais", length = 60)
     private String pais;
     
+    @Column(name = "direccion", columnDefinition = "TEXT")
+    private String direccion;
+    
+    @Column(name = "telefono", length = 20)
+    private String telefono;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "empresa_estado")
     private EstadoEmpresa estado;

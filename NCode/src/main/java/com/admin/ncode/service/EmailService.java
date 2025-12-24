@@ -134,7 +134,9 @@ public class EmailService {
                 throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage(), e);
             }
         } else {
-            throw new RuntimeException("No hay servicio de email configurado (SendGrid o SMTP)");
+            logger.warn("No hay servicio de email configurado (SendGrid o SMTP). El código de demo es: {}", codigo);
+            // No lanzar excepción, solo loguear el warning
+            // El código ya está guardado en la BD, así que el usuario puede usarlo
         }
     }
     
@@ -155,6 +157,7 @@ public class EmailService {
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
+            
             Response response = sg.api(request);
             
             if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
@@ -164,6 +167,9 @@ public class EmailService {
                            response.getStatusCode(), response.getBody());
                 throw new RuntimeException("Error al enviar email con SendGrid: " + response.getStatusCode() + " - " + response.getBody());
             }
+        } catch (java.net.SocketTimeoutException ex) {
+            logger.error("Timeout al enviar email con SendGrid: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Timeout al enviar email con SendGrid: " + ex.getMessage(), ex);
         } catch (IOException ex) {
             logger.error("Error de IO al enviar email con SendGrid: {}", ex.getMessage(), ex);
             throw ex;
@@ -234,7 +240,7 @@ public class EmailService {
                 "<div class='code-box'>" +
                 "<div class='code'>" + codigo + "</div>" +
                 "</div>" +
-                "<p>Este código es válido por 15 minutos. Nuestro equipo se pondrá en contacto contigo pronto para coordinar la demostración.</p>" +
+                "<p>Este código es válido por 1 día (24 horas). Nuestro equipo se pondrá en contacto contigo pronto para coordinar la demostración.</p>" +
                 "<p>Saludos,<br><strong>Equipo NCOD3</strong></p>" +
                 "</div>" +
                 "<div class='footer'>" +

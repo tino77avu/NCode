@@ -42,11 +42,39 @@ public class DemoController {
 
     @Autowired
     private EmpresaRepository empresaRepository;
-    
+
     @Autowired
     private SolicitudDemoRepository solicitudDemoRepository;
 
-    @PostMapping("/solicitar")
+    @GetMapping
+    public String mostrarDemo(Model model, HttpSession session) {
+        try {
+            logger.debug("Accediendo a GET /demo");
+            Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
+            model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
+            logger.debug("isAuthenticated: {}", isAuthenticated);
+            
+            // Siempre crear un nuevo DemoRequest vacío para asegurar que los campos estén limpios
+            // Solo mantener el demoRequest del modelo si hay errores de validación (viene de POST)
+            // Si viene de un redirect exitoso, no habrá demoRequest en el modelo, así que creamos uno vacío
+            if (!model.containsAttribute("demoRequest")) {
+                model.addAttribute("demoRequest", new DemoRequest());
+                logger.debug("demoRequest vacío agregado al modelo (nueva solicitud)");
+            } else {
+                // Si existe, es porque hay errores de validación, así que lo mantenemos
+                logger.debug("demoRequest mantenido del modelo (hay errores de validación)");
+            }
+            
+            // Los mensajes flash se agregan automáticamente por Spring si existen
+            logger.debug("Retornando vista 'demo'");
+            return "demo";
+        } catch (Exception e) {
+            logger.error("Error en GET /demo: {}", e.getMessage(), e);
+            throw e; // Re-lanzar para que Spring maneje el error
+        }
+    }
+
+    @PostMapping
     public String solicitarDemo(@Valid @ModelAttribute("demoRequest") DemoRequest demoRequest,
                                 BindingResult bindingResult,
                                 HttpServletRequest request,
@@ -54,29 +82,77 @@ public class DemoController {
                                 Model model,
                                 RedirectAttributes redirectAttributes) {
         
+        logger.info("POST /demo - Iniciando procesamiento. RUC: {}, Email: {}", 
+                   demoRequest != null ? demoRequest.getRuc() : "null", 
+                   demoRequest != null ? demoRequest.getCorreo() : "null");
+        
         // Validación
         if (bindingResult.hasErrors()) {
-            logger.warn("Error de validación en solicitud de demo desde IP: {}", obtenerIpCliente(request));
+            logger.warn("Error de validación en solicitud de demo desde IP: {}. Errores: {}", 
+                       obtenerIpCliente(request), bindingResult.getAllErrors());
             // Mantener el objeto en el modelo para mostrar errores
-            model.addAttribute("isAuthenticated", false);
-            redirectAttributes.addFlashAttribute("demoRequest", demoRequest);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.demoRequest", bindingResult);
-            redirectAttributes.addFlashAttribute("mensajeError", "Por favor, completa todos los campos correctamente.");
-            return "redirect:/#demo";
+            Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
+            model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
+            model.addAttribute("demoRequest", demoRequest);
+            model.addAttribute("mensajeError", "Por favor, completa todos los campos correctamente.");
+            logger.debug("Retornando vista demo con errores de validación");
+            return "demo";
         }
 
         try {
-            // Generar código de verificación
-            String codigo = CodigoGenerador.generarCodigo();
+            // Validar si la empresa ya tiene una demo vigente o en proceso
+            List<SolicitudDemo> demosActivas;
+            try {
+                demosActivas = solicitudDemoRepository.findActivasByRuc(demoRequest.getRuc());
+                logger.debug("Búsqueda de demos activas para RUC: {}. Encontradas: {}", demoRequest.getRuc(), demosActivas.size());
+            } catch (Exception e) {
+                logger.error("Error al buscar demos activas para RUC: {}", demoRequest.getRuc(), e);
+                demosActivas = List.of(); // Continuar sin validación si hay error
+            }
+            if (!demosActivas.isEmpty()) {
+                SolicitudDemo demoActiva = demosActivas.get(0); // La más reciente
+                String estadoMensaje = demoActiva.getEstado().equals("PENDIENTE") ? "en proceso" : "vigente";
+                logger.warn("Intento de solicitar demo para empresa con demo {} existente. RUC: {}, IP: {}", 
+                           estadoMensaje, demoRequest.getRuc(), obtenerIpCliente(request));
+                Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
+                model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
+                model.addAttribute("demoRequest", demoRequest);
+                model.addAttribute("mensajeError", 
+                    "La empresa con RUC " + demoRequest.getRuc() + " ya tiene una demo " + estadoMensaje + ". " +
+                    "Por favor, contacta con soporte si necesitas ayuda.");
+                return "demo";
+            }
+
+            String codigo = null;
+            Long empresaId = null;
+            Long codigoId = null;
+            String ipCliente = null;
             
-            // Buscar o crear empresa por RUC
-            Long empresaId = obtenerOcrearEmpresa(demoRequest);
+            try {
+                logger.info("Iniciando procesamiento de solicitud de demo. RUC: {}, Email: {}", 
+                           demoRequest.getRuc(), demoRequest.getCorreo());
+                
+            // Generar código de verificación
+                codigo = CodigoGenerador.generarCodigo();
+                logger.debug("Código de verificación generado: {}", codigo);
+                
+                // Buscar o crear empresa por RUC
+                try {
+                    empresaId = obtenerOcrearEmpresa(demoRequest);
+                    logger.debug("Empresa ID obtenido: {}", empresaId);
+                } catch (Exception e) {
+                    logger.error("Error al obtener o crear empresa. RUC: {}", demoRequest.getRuc(), e);
+                    throw new RuntimeException("Error al procesar la información de la empresa: " + e.getMessage(), e);
+                }
             
             // Obtener IP del cliente
-            String ipCliente = obtenerIpCliente(request);
+                ipCliente = obtenerIpCliente(request);
+                logger.debug("IP del cliente: {}", ipCliente);
             
             // Guardar código de verificación en la base de datos
-            LocalDateTime fechaExpiracion = LocalDateTime.now().plusMinutes(15);
+                // Para el demo, el código tiene validez de 1 día (24 horas)
+                LocalDateTime fechaExpiracion = LocalDateTime.now().plusDays(1);
+                try {
             codigoVerificacionRepository.insertCodigoVerificacion(
                 null, // usuarioId es null para solicitudes de demo (no hay usuario registrado aún)
                 empresaId,
@@ -88,54 +164,137 @@ public class DemoController {
                 fechaExpiracion,
                 ipCliente
             );
-            
-            // Buscar el código recién insertado para obtener su ID
-            Long codigoId = null;
-            try {
-                Optional<CodigoVerificacion> codigoOpt = codigoVerificacionRepository.findByCodigoAndTipoDemo(codigo);
-                if (codigoOpt.isPresent()) {
-                    codigoId = codigoOpt.get().getCodigoId();
+                    logger.debug("Código de verificación guardado en BD. Fecha de expiración: {} (1 día desde ahora)", fechaExpiracion);
+                } catch (Exception e) {
+                    logger.error("Error al guardar código de verificación en BD: {}", e.getMessage(), e);
+                    throw new RuntimeException("Error al guardar el código de verificación: " + e.getMessage(), e);
                 }
-            } catch (Exception e) {
-                logger.warn("No se pudo obtener el ID del código de verificación: {}", e.getMessage());
-            }
-            
-            // Guardar solicitud de demo en la tabla dedicada
-            SolicitudDemo solicitudDemo = new SolicitudDemo();
-            solicitudDemo.setNombre(demoRequest.getNombre());
-            solicitudDemo.setCorreo(demoRequest.getCorreo());
-            solicitudDemo.setEmpresa(demoRequest.getEmpresa());
-            solicitudDemo.setRuc(demoRequest.getRuc());
-            solicitudDemo.setDireccion(demoRequest.getDireccion());
-            solicitudDemo.setCodigoId(codigoId);
-            solicitudDemo.setCodigoVerificacion(codigo);
-            solicitudDemo.setEstado("PENDIENTE");
-            solicitudDemo.setIpCliente(ipCliente);
-            solicitudDemoRepository.save(solicitudDemo);
-            
-            // Enviar email con el código
+                
+                // Buscar el código recién insertado para obtener su ID
+                try {
+                    Optional<CodigoVerificacion> codigoOpt = codigoVerificacionRepository.findByCodigoAndTipoDemo(codigo);
+                    if (codigoOpt.isPresent()) {
+                        codigoId = codigoOpt.get().getCodigoId();
+                        logger.debug("ID del código de verificación obtenido: {}", codigoId);
+                    }
+                } catch (Exception e) {
+                    logger.warn("No se pudo obtener el ID del código de verificación: {}", e.getMessage());
+                    // Continuar sin el ID, no es crítico
+                }
+                
+                // Guardar solicitud de demo en la tabla dedicada
+                try {
+                    SolicitudDemo solicitudDemo = new SolicitudDemo();
+                    solicitudDemo.setNombre(demoRequest.getNombre());
+                    solicitudDemo.setCorreo(demoRequest.getCorreo());
+                    solicitudDemo.setEmpresa(demoRequest.getEmpresa());
+                    solicitudDemo.setRuc(demoRequest.getRuc());
+                    solicitudDemo.setDireccion(demoRequest.getDireccion());
+                    solicitudDemo.setCodigoId(codigoId);
+                    solicitudDemo.setCodigoVerificacion(codigo);
+                    solicitudDemo.setEstado("PENDIENTE");
+                    solicitudDemo.setIpCliente(ipCliente);
+                    solicitudDemoRepository.save(solicitudDemo);
+                    logger.debug("Solicitud de demo guardada en BD");
+                } catch (Exception e) {
+                    logger.error("Error al guardar solicitud de demo en BD: {}", e.getMessage(), e);
+                    throw new RuntimeException("Error al guardar la solicitud de demo: " + e.getMessage(), e);
+                }
+                
+                // Enviar email con el código (en un try-catch separado para no fallar si el email falla)
+                boolean emailEnviado = false;
+                try {
             emailService.enviarCodigoDemo(demoRequest.getCorreo(), codigo, demoRequest.getNombre());
+                    emailEnviado = true;
+                    logger.info("Email de demo enviado exitosamente a: {}", demoRequest.getCorreo());
+                } catch (Exception emailException) {
+                    logger.error("Error al enviar email de demo a: {}. El código ya está guardado: {}", 
+                                demoRequest.getCorreo(), codigo, emailException);
+                    // No lanzar la excepción, solo loguear el error
+                    // El código ya está guardado, así que el usuario puede usarlo
+                }
             
             // Guardar información en sesión para mostrar en la página
+                try {
             session.setAttribute("demoSolicitado", true);
             session.setAttribute("demoEmail", demoRequest.getCorreo());
             session.setAttribute("demoNombre", demoRequest.getNombre());
+                    session.setAttribute("demoCodigo", codigo); // Guardar código en sesión por si el email falla
+                    logger.debug("Información guardada en sesión");
+                } catch (Exception e) {
+                    logger.warn("Error al guardar información en sesión: {}", e.getMessage());
+                    // Continuar aunque falle, no es crítico
+                }
+                
+                logger.info("Solicitud de demo recibida. Empresa: {}, RUC: {}, Email: {}, IP: {}, Email enviado: {}", 
+                           demoRequest.getEmpresa(), demoRequest.getRuc(), demoRequest.getCorreo(), ipCliente, emailEnviado);
             
-            logger.info("Solicitud de demo recibida. Empresa: {}, RUC: {}, Email: {}, IP: {}", 
-                       demoRequest.getEmpresa(), demoRequest.getRuc(), demoRequest.getCorreo(), ipCliente);
-            
+                // Agregar mensaje de éxito
+                try {
+                    if (emailEnviado) {
+                        redirectAttributes.addFlashAttribute("mensajeExito", 
+                            "¡Solicitud recibida! Hemos enviado un código de verificación a tu correo electrónico. Por favor, revisa tu bandeja de entrada.");
+                    } else {
             redirectAttributes.addFlashAttribute("mensajeExito", 
-                "¡Solicitud recibida! Hemos enviado un código de verificación a " + demoRequest.getCorreo());
+                            "¡Solicitud recibida! Tu código de verificación es: " + codigo + 
+                            ". Por favor, guárdalo ya que hubo un problema al enviar el email.");
+                    }
+                    logger.debug("Flash attributes agregados exitosamente");
+                } catch (Exception e) {
+                    logger.error("Error al agregar flash attributes: {}", e.getMessage(), e);
+                    // Continuar con el redirect aunque falle
+                }
+                
+                logger.info("Redirigiendo a página de demo después de procesar solicitud");
+                return "redirect:/demo";
             
-            return "redirect:/#demo";
+            } catch (Throwable innerException) {
+                // Capturar errores internos y re-lanzarlos para que el catch externo los maneje
+                logger.error("Error interno al procesar solicitud de demo. RUC: {}, Email: {}, Error: {}", 
+                           demoRequest.getRuc(), 
+                           demoRequest.getCorreo(), 
+                           innerException.getMessage(), 
+                           innerException);
+                throw innerException; // Re-lanzar para que el catch externo lo maneje
+            }
             
-        } catch (Exception e) {
-            logger.error("Error al procesar solicitud de demo. Email: {}, IP: {}", 
-                        demoRequest.getCorreo(), obtenerIpCliente(request), e);
-            redirectAttributes.addFlashAttribute("demoRequest", demoRequest);
-            redirectAttributes.addFlashAttribute("mensajeError", 
-                "Error al procesar la solicitud. Por favor, intenta nuevamente.");
-            return "redirect:/#demo";
+        } catch (Throwable e) {
+            // Capturar cualquier error, incluyendo Error y RuntimeException
+            logger.error("Error al procesar solicitud de demo. Email: {}, IP: {}, Error: {}, StackTrace: {}", 
+                        demoRequest.getCorreo() != null ? demoRequest.getCorreo() : "N/A", 
+                        obtenerIpCliente(request), 
+                        e.getMessage(),
+                        java.util.Arrays.toString(e.getStackTrace()),
+                        e);
+            
+            // Asegurar que siempre se haga redirect, incluso si hay error
+            try {
+                logger.debug("Intentando agregar flash attributes para redirect de error");
+                Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
+                model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
+                if (demoRequest != null) {
+                    model.addAttribute("demoRequest", demoRequest);
+                } else {
+                    model.addAttribute("demoRequest", new DemoRequest());
+                }
+                String mensajeError = "Error al procesar la solicitud. Por favor, intenta nuevamente.";
+                // codigo solo existe en el scope del try principal, no aquí
+                model.addAttribute("mensajeError", mensajeError);
+                logger.info("Retornando vista demo después de error");
+                return "demo";
+            } catch (Throwable redirectException) {
+                logger.error("Error crítico al intentar redirigir: {}, StackTrace: {}", 
+                           redirectException.getMessage(),
+                           java.util.Arrays.toString(redirectException.getStackTrace()),
+                           redirectException);
+                // Si el redirect falla, al menos intentar mostrar un mensaje de error
+                model.addAttribute("isAuthenticated", false);
+                model.addAttribute("mensajeError", "Error crítico al procesar la solicitud. Por favor, contacta con soporte.");
+                if (!model.containsAttribute("demoRequest")) {
+                    model.addAttribute("demoRequest", demoRequest != null ? demoRequest : new DemoRequest());
+                }
+                return "demo";
+            }
         }
     }
 
@@ -169,6 +328,8 @@ public class DemoController {
                     demoRequest.getEmpresa(),
                     demoRequest.getEmpresa(),
                     "Peru",
+                    demoRequest.getDireccion(),
+                    demoRequest.getTelefono(),
                     "ACTIVA"
                 );
                 
@@ -185,7 +346,7 @@ public class DemoController {
                     empresaCreada = empresaRepository.findByRuc(demoRequest.getRuc());
                     if (empresaCreada.isPresent()) {
                         return empresaCreada.get().getEmpresaId();
-                    }
+        }
                     throw new RuntimeException("Error al crear la empresa: no se pudo encontrar después de insertar");
                 }
             } catch (org.springframework.dao.DataIntegrityViolationException e) {

@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Demos - NCOD3</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        #gestion-menu:hover + #gestion-dropdown,
+        #gestion-dropdown:hover {
+            display: block !important;
+        }
+        
+        .demos-container {
+            margin-top: 100px;
+            padding: 3rem 0;
+        }
+
+        .demos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .demos-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .demos-table-container {
+            background: linear-gradient(135deg, var(--bg-section) 0%, rgba(17, 17, 17, 0.9) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            overflow-x: visible;
+        }
+
+        .demos-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .demos-table thead {
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .demos-table th {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            color: var(--primary-green);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .demos-table th:nth-child(1) { width: 5%; }
+        .demos-table th:nth-child(2) { width: 15%; }
+        .demos-table th:nth-child(3) { width: 20%; }
+        .demos-table th:nth-child(4) { width: 12%; }
+        .demos-table th:nth-child(5) { width: 12%; }
+        .demos-table th:nth-child(6) { width: 10%; }
+        .demos-table th:nth-child(7) { width: 26%; min-width: 120px; }
+
+        .demos-table td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .demos-table td:last-child {
+            white-space: normal;
+            overflow: visible;
+        }
+
+        .demos-table tbody tr:hover {
+            background-color: rgba(0, 191, 255, 0.05);
+        }
+
+        .demos-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .btn-action {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            min-height: 36px;
+            background-color: transparent;
+            flex-shrink: 0;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .btn-action svg {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            min-height: 18px;
+            fill: currentColor;
+            display: block;
+        }
+
+        .btn-process {
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+        }
+
+        .btn-process:hover {
+            background-color: rgba(0, 191, 255, 0.1);
+        }
+
+        .btn-cancel {
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+
+        .btn-cancel:hover {
+            background-color: rgba(255, 68, 68, 0.1);
+        }
+
+        .btn-view {
+            color: var(--primary-green) !important;
+            border: 1px solid var(--primary-green) !important;
+            display: inline-flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background-color: rgba(0, 191, 255, 0.05) !important;
+        }
+
+        .btn-view:hover {
+            background-color: rgba(0, 191, 255, 0.2) !important;
+        }
+
+        .btn-view svg {
+            fill: var(--primary-green) !important;
+        }
+
+        .demos-table td:last-child {
+            white-space: normal;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--bg-section) 0%, rgba(17, 17, 17, 0.95) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .modal-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .modal-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-value {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            padding: 0.75rem;
+            background-color: rgba(0, 191, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            word-break: break-word;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background-color: rgba(0, 191, 255, 0.1);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .alert-error {
+            background-color: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+
+        .estado-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .estado-pendiente {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .estado-procesado {
+            background-color: rgba(0, 191, 255, 0.2);
+            color: var(--primary-green);
+        }
+
+        .estado-cancelado {
+            background-color: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        @media (max-width: 768px) {
+            .demos-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .demos-table-container {
+                overflow-x: scroll;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación Superior -->
+    <nav class="navbar">
+        <div class="nav-container" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%;">
+            <div class="logo-container" style="justify-self: start;">
+                <a th:href="@{/}" style="text-decoration: none;">
+                    <span class="logo-text">NCOD<span class="logo-owl">3</span></span>
+                </a>
+            </div>
+            <div style="justify-self: center;">
+                <img th:src="@{/images/Logo.JPG}" alt="NCOD3 Logo" style="max-height: 60px; width: auto; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+            </div>
+            <div class="nav-menu" style="justify-self: end;">
+                <div style="position: relative; display: inline-block;" onmouseenter="document.getElementById('gestion-dropdown').style.display='block'" onmouseleave="document.getElementById('gestion-dropdown').style.display='none'">
+                    <a href="#" class="nav-link" id="gestion-menu">Gestión</a>
+                    <div id="gestion-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background-color: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0; margin-top: 0.5rem; min-width: 150px; z-index: 1000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+                        <a th:href="@{/gestion/roles}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Roles</a>
+                        <a th:href="@{/gestion/empresas}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Empresas</a>
+                        <a th:href="@{/gestion/usuarios}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Usuarios</a>
+                        <a th:href="@{/gestion/demos}" class="nav-link" style="display: block; padding: 0.75rem 1.5rem;">Demos</a>
+                    </div>
+                </div>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="nav-link nav-link-login" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit; font: inherit; text-decoration: none;">Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor Principal -->
+    <section class="demos-container">
+        <div class="container">
+            <div class="demos-header">
+                <h1 class="demos-title">Gestión de Demos</h1>
+            </div>
+
+            <!-- Mensajes de éxito/error -->
+            <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+            <div th:if="${mensajeError}" class="alert alert-error" th:text="${mensajeError}"></div>
+
+            <!-- Tabla de Demos -->
+            <div class="demos-table-container">
+                <table class="demos-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Empresa</th>
+                            <th>RUC</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="demo : ${demos}">
+                            <td th:text="${demo.solicitudId}">1</td>
+                            <td th:text="${demo.nombre}">Nombre</td>
+                            <td th:text="${demo.empresa}">Empresa</td>
+                            <td th:text="${demo.ruc}">RUC</td>
+                            <td>
+                                <span th:if="${demo.estado == 'PENDIENTE'}" 
+                                      class="estado-badge estado-pendiente">Pendiente</span>
+                                <span th:if="${demo.estado == 'PROCESADO'}" 
+                                      class="estado-badge estado-procesado">Procesado</span>
+                                <span th:if="${demo.estado == 'CANCELADO'}" 
+                                      class="estado-badge estado-cancelado">Cancelado</span>
+                            </td>
+                            <td th:text="${demo.fechaSolicitud != null ? #temporals.format(demo.fechaSolicitud, 'dd/MM/yyyy') : 'N/A'}">Fecha</td>
+                            <td>
+                                <button type="button" class="btn-action btn-view" 
+                                        style="display: inline-flex !important; visibility: visible !important; opacity: 1 !important; color: #00bfff !important; border: 1px solid #00bfff !important; background-color: rgba(0, 191, 255, 0.1) !important;"
+                                        th:data-id="${demo.solicitudId != null ? demo.solicitudId : ''}"
+                                        th:data-nombre="${demo.nombre != null ? demo.nombre : ''}"
+                                        th:data-correo="${demo.correo != null ? demo.correo : ''}"
+                                        th:data-empresa="${demo.empresa != null ? demo.empresa : ''}"
+                                        th:data-ruc="${demo.ruc != null ? demo.ruc : ''}"
+                                        th:data-direccion="${demo.direccion != null ? demo.direccion : ''}"
+                                        th:data-codigo="${demo.codigoVerificacion != null ? demo.codigoVerificacion : ''}"
+                                        th:data-estado="${demo.estado != null ? demo.estado : ''}"
+                                        th:data-fecha-solicitud="${demo.fechaSolicitud != null ? #temporals.format(demo.fechaSolicitud, 'yyyy-MM-dd') + 'T' + #temporals.format(demo.fechaSolicitud, 'HH:mm:ss') : ''}"
+                                        th:data-fecha-procesado="${demo.fechaProcesado != null ? #temporals.format(demo.fechaProcesado, 'yyyy-MM-dd') + 'T' + #temporals.format(demo.fechaProcesado, 'HH:mm:ss') : ''}"
+                                        th:data-ip="${demo.ipCliente != null ? demo.ipCliente : ''}"
+                                        th:data-notas="${demo.notas != null ? demo.notas : ''}"
+                                        onclick="verDetalles(this)"
+                                        title="Ver detalles">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" style="width: 18px; height: 18px; fill: #00bfff !important; display: block !important;">
+                                        <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.2-1.8-10.1 4.6-8 8.7c2.1 8.2 6.5 15.2 12.8 20.5c9.9 8.8 23.3 14.1 38.1 14.1c30.9 0 56-25.1 56-56c0-14.8-5.3-28.2-14.1-38.1c-5.3-6.3-12.3-10.7-20.5-12.8c-4.1-2.1-10.5 2.8-8.7 8c2.1 6.4 3.3 13.2 3.3 20.3z"/>
+                                    </svg>
+                                </button>
+                                <form th:action="@{/gestion/demos/procesar/{id}(id=${demo.solicitudId})}" method="post" style="display: inline;" th:if="${demo.estado == 'PENDIENTE'}">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="btn-action btn-process" title="Marcar como procesado">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                                <form th:action="@{/gestion/demos/cancelar/{id}(id=${demo.solicitudId})}" method="post" style="display: inline;" th:if="${demo.estado == 'PENDIENTE'}">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="btn-action btn-cancel" title="Cancelar solicitud">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${demos == null or demos.isEmpty()}">
+                            <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                                No hay solicitudes de demo registradas
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <!-- Sección Superior: Redes Sociales -->
+            <div class="footer-section footer-top">
+                <span class="footer-top-text">Síguenos en:</span>
+                <div class="footer-social">
+                    <a href="https://www.facebook.com/ncod3" target="_blank" class="social-icon" title="Facebook">
+                        f
+                    </a>
+                    <a href="https://www.instagram.com/ncod3" target="_blank" class="social-icon instagram" title="Instagram">
+                        📷
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sección Media: Título -->
+            <div class="footer-section footer-middle">
+                <h3>AYUDA Y LEGALES</h3>
+            </div>
+
+            <!-- Sección Inferior: Enlaces y Libro de Reclamaciones -->
+            <div class="footer-section footer-bottom">
+                <div class="footer-links">
+                    <a th:href="@{/legal/politica-privacidad}">Política de Privacidad</a>
+                    <a th:href="@{/legal/politicas-cookies}">Políticas de cookies</a>
+                    <a th:href="@{/legal/terminos-condiciones}">Términos y condiciones de uso</a>
+                </div>
+                <a th:href="@{/legal/libro-reclamaciones}" class="footer-reclamaciones">
+                    <div class="footer-reclamaciones-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6H20V18H4V6ZM2 4V20H22V4H2Z" fill="#00BFFF"/>
+                            <path d="M6 8H18V10H6V8ZM6 12H18V14H6V12ZM6 16H14V18H6V16Z" fill="#00BFFF"/>
+                        </svg>
+                    </div>
+                    <span class="footer-reclamaciones-text">Libro de Reclamaciones</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/1234567890" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 339.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56 81.2 56 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+        </svg>
+    </a>
+
+    <!-- Modal de Detalles -->
+    <div id="modal-overlay" class="modal-overlay" onclick="cerrarModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">Detalles de la Solicitud</h2>
+                <button class="modal-close" onclick="cerrarModal()" title="Cerrar">×</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Los detalles se cargarán dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function verDetalles(button) {
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre') || 'N/A';
+            const correo = button.getAttribute('data-correo') || 'N/A';
+            const empresa = button.getAttribute('data-empresa') || 'N/A';
+            const ruc = button.getAttribute('data-ruc') || 'N/A';
+            const direccion = button.getAttribute('data-direccion') || 'N/A';
+            const codigo = button.getAttribute('data-codigo') || 'N/A';
+            const estado = button.getAttribute('data-estado') || 'N/A';
+            const fechaSolicitud = button.getAttribute('data-fecha-solicitud') || '';
+            const fechaProcesado = button.getAttribute('data-fecha-procesado') || '';
+            const ip = button.getAttribute('data-ip') || 'N/A';
+            const notas = button.getAttribute('data-notas') || 'Sin notas';
+            
+            function formatearFecha(fechaStr) {
+                if (!fechaStr || fechaStr === '') return 'N/A';
+                try {
+                    // Convertir formato 'yyyy-MM-ddTHH:mm:ss' a formato ISO para JavaScript
+                    const fechaISO = fechaStr.replace(' ', 'T');
+                    const fecha = new Date(fechaISO);
+                    if (isNaN(fecha.getTime())) {
+                        return fechaStr;
+                    }
+                    return fecha.toLocaleString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } catch (e) {
+                    return fechaStr;
+                }
+            }
+            
+            function getEstadoBadge(estado) {
+                if (estado === 'PENDIENTE') {
+                    return '<span class="estado-badge estado-pendiente">Pendiente</span>';
+                } else if (estado === 'PROCESADO') {
+                    return '<span class="estado-badge estado-procesado">Procesado</span>';
+                } else if (estado === 'CANCELADO') {
+                    return '<span class="estado-badge estado-cancelado">Cancelado</span>';
+                }
+                return estado;
+            }
+            
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <div class="modal-field">
+                    <span class="modal-label">ID</span>
+                    <div class="modal-value">${id}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">Nombre</span>
+                    <div class="modal-value">${nombre}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">Correo</span>
+                    <div class="modal-value">${correo}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">Empresa</span>
+                    <div class="modal-value">${empresa}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">RUC</span>
+                    <div class="modal-value">${ruc}</div>
+                </div>
+                <div class="modal-field full-width">
+                    <span class="modal-label">Dirección</span>
+                    <div class="modal-value">${direccion}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">Código de Verificación</span>
+                    <div class="modal-value">${codigo}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">Estado</span>
+                    <div class="modal-value">${getEstadoBadge(estado)}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">Fecha de Solicitud</span>
+                    <div class="modal-value">${formatearFecha(fechaSolicitud)}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">Fecha Procesado</span>
+                    <div class="modal-value">${formatearFecha(fechaProcesado)}</div>
+                </div>
+                <div class="modal-field">
+                    <span class="modal-label">IP Cliente</span>
+                    <div class="modal-value">${ip}</div>
+                </div>
+                <div class="modal-field full-width">
+                    <span class="modal-label">Notas</span>
+                    <div class="modal-value">${notas}</div>
+                </div>
+            `;
+            
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+        
+        function cerrarModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        
+        // Cerrar modal con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cerrarModal();
+            }
+        });
+        
+        // Ocultar mensajes después de 1.5 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            const mensajes = document.querySelectorAll('.alert');
+            mensajes.forEach(function(mensaje) {
+                setTimeout(function() {
+                    mensaje.style.transition = 'opacity 0.5s ease-out';
+                    mensaje.style.opacity = '0';
+                    setTimeout(function() {
+                        mensaje.style.display = 'none';
+                    }, 500);
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -27,6 +27,10 @@ public class DemoRequest {
     @Size(max = 300, message = "La dirección no puede exceder 300 caracteres")
     private String direccion;
     
+    @NotBlank(message = "El teléfono es requerido")
+    @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
+    private String telefono;
+    
     public String getNombre() {
         return nombre;
     }
@@ -65,6 +69,14 @@ public class DemoRequest {
     
     public void setDireccion(String direccion) {
         this.direccion = direccion != null ? direccion.trim() : null;
+    }
+    
+    public String getTelefono() {
+        return telefono;
+    }
+    
+    public void setTelefono(String telefono) {
+        this.telefono = telefono != null ? telefono.trim() : null;
     }
 }
 

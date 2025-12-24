@@ -47,6 +47,7 @@ public class SecurityConfig {
                     "/olvidar-contrasena",
                     "/cambiar-contrasena",
                     "/demo/**",
+                    "/legal/**",
                     "/css/**",
                     "/images/**",
                     "/js/**",
